@@ -286,6 +286,15 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
       </div>
     </div>
     <div class="navgrp">
+      <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>world</button>
+      <div class="grpitems">
+        <a href="#trace" data-p="trace">trace</a>
+        <a href="#net" data-p="net">net</a>
+        <a href="#cvar" data-p="cvar">cvar</a>
+        <a href="#plist" data-p="plist">playerlist</a>
+      </div>
+    </div>
+    <div class="navgrp">
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>misc</button>
       <div class="grpitems">
         <a href="#globals" data-p="globals">globals</a>
@@ -502,7 +511,8 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
 <div class="entry"><div class="sig"><b>cmd:get_weaponselect</b>( ) <em>&middot;</em> <b>cmd:set_weaponselect</b>( <i>v</i> )</div><div class="desc">Weapon switch.</div></div>
 <div class="entry"><div class="sig"><b>cmd:add_button</b>( <i>bit</i> ) <em>&middot;</em> <b>cmd:strip_button</b>( <i>bit</i> ) <em>&middot;</em> <b>cmd:has_button</b>( <i>bit</i> )</div><div class="desc">Add, remove or test a button. See <a href='#enums' data-p='enums' class='xref'>enums</a>.</div></div>
 <div class="entry"><div class="sig"><b>cmd:get_buttons</b>( ) <em>&middot;</em> <b>cmd:get_command_number</b>( ) <em>&middot;</em> <b>cmd:get_tick</b>( ) <em>&middot;</em> <b>cmd:get_random_seed</b>( )<span class="pill">read only</span></div><div class="desc">Changing these would desync you from the server.</div></div>
-<div class="note warn"><strong><code>IN_ATTACK</code> is handled by the cheat.</strong> You can&rsquo;t remove it &mdash; the aimbot already decided. You can add it, but only when <code>client.can_fire()</code> is true. Both calls return <code>false</code> if the attack bit was ignored.</div><div class="note "><strong>Only use <code>cmd</code> inside the callback that gave it to you.</strong> Don&rsquo;t save it in a variable for later.</div>
+<div class="entry"><div class="sig"><b>cmd:quick_stop</b>( <em>[slide]</em> ) <em>&rarr; bool</em></div><div class="desc">Counter-strafe to a stop &mdash; the same routine the cheat&rsquo;s own auto stop uses. Pass <code>true</code> to stop at the weapon&rsquo;s accurate walking speed instead of a dead halt. Returns <code>false</code> if it was refused.</div></div>
+<div class="note warn"><strong><code>quick_stop</code> works in <code>pre_move</code> and <code>in_move</code>, not <code>post_move</code>.</strong> By <code>post_move</code> the movement fix has already run, so anything written then is in the wrong frame of reference and nothing corrects it. It also returns <code>false</code> when you&rsquo;re dead or the command isn&rsquo;t the one the cheat is working on.</div><div class="note warn"><strong><code>IN_ATTACK</code> is handled by the cheat.</strong> You can&rsquo;t remove it &mdash; the aimbot already decided. You can add it, but only when <code>client.can_fire()</code> is true. Both calls return <code>false</code> if the attack bit was ignored.</div><div class="note "><strong>Only use <code>cmd</code> inside the callback that gave it to you.</strong> Don&rsquo;t save it in a variable for later.</div>
   </div>
 
   <div class="page" id="p-obj-shot">
@@ -701,6 +711,94 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
     <h1>weapon data</h1>
     <div class="intro"><p><code>w:get_wpn_data()</code> returns a table of everything the game knows about that weapon. These never change, so read once and keep it.</p></div>
     <div class="tw"><table><thead><tr><th>group</th><th>fields</th></tr></thead><tbody><tr><td>timing</td><td><code>cycletime</code>, <code>cycletime_alt</code>, <code>time_to_idle</code></td></tr><tr><td>damage</td><td><code>damage</code>, <code>armor_ratio</code>, <code>bullets</code>, <code>penetration</code>, <code>range</code>, <code>range_modifier</code></td></tr><tr><td>accuracy</td><td><code>spread</code>, <code>inaccuracy_stand</code>, <code>_crouch</code>, <code>_move</code>, <code>_jump</code>, <code>_jump_initial</code>, <code>_land</code>, <code>_ladder</code>, <code>_fire</code>, <code>_reload</code></td></tr><tr><td>recovery</td><td><code>recovery_time_stand</code>, <code>_crouch</code>, their <code>_final</code>, <code>recovery_transition_start_bullet</code>, <code>_end_bullet</code></td></tr><tr><td>recoil</td><td><code>recoil_angle</code>, <code>recoil_magnitude</code>, their variances, <code>recoil_seed</code></td></tr><tr><td>info</td><td><code>name</code>, <code>type</code>, <code>price</code>, <code>full_auto</code>, <code>has_silencer</code>, <code>max_clip</code>, <code>max_reserve</code>, <code>max_player_speed</code></td></tr></tbody></table></div><div class="note "><strong>Most fields have an <code>_alt</code> version</strong> &mdash; that&rsquo;s the value when the weapon is scoped, silenced or in burst mode. Use <code>w:get_mode()</code> to know which applies.</div><div class="note warn"><code>cycletime</code> is how fast the weapon shoots. <code>recovery_time_*</code> is how fast accuracy comes back after shooting. Different things.</div>
+  </div>
+
+  <div class="page" id="p-trace">
+    <p class="kicker">world</p>
+    <h1>trace</h1>
+    <div class="intro"><p>Ask the game what&rsquo;s actually there &mdash; line of sight, cover, surfaces, and how much damage a bullet would still be carrying when it arrives.</p></div>
+    <div class="entry"><div class="sig"><b>trace.line</b>( <i>x1, y1, z1, x2, y2, z2</i>, <em>[skip]</em>, <em>[mask]</em> ) <em>&rarr; table | nil</em></div><div class="desc">Fire a ray. <code>skip</code> is an entity to ignore &mdash; it defaults to <b>you</b>, so a trace from your own eyes doesn&rsquo;t just hit your own hitboxes. <code>mask</code> defaults to <code>enums.mask.shot</code>.</div></div>
+<div class="entry"><div class="sig"><b>trace.hull</b>( <i>x1, y1, z1, x2, y2, z2, mins, maxs</i>, <em>[skip]</em>, <em>[mask]</em> ) <em>&rarr; table | nil</em></div><div class="desc">Same, but sweeps a box. <code>mins</code> and <code>maxs</code> are <code>{ x, y, z }</code> tables.</div></div>
+<div class="entry"><div class="sig"><b>trace.point_contents</b>( <i>x, y, z</i>, <em>[mask]</em> ) <em>&rarr; number</em></div><div class="desc">What&rsquo;s at a point, as a bitfield of <a href='#enums' data-p='enums' class='xref'>enums.contents</a>. No ray, no filter &mdash; the cheap &ldquo;am I inside something&rdquo; test.</div></div>
+<div class="entry"><div class="sig"><b>trace.bullet</b>( <i>target, x, y, z</i>, <em>[penetrate]</em> ) <em>&rarr; table</em></div><div class="desc">How much damage your <b>currently held</b> weapon would do to <code>target</code> at that point, walls included. This is the cheat&rsquo;s own penetration maths, so it agrees with what the aimbot believes.</div></div>
+<p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">what a trace gives you</p><div class="tw"><table><thead><tr><th>key</th><th>meaning</th></tr></thead><tbody><tr><td><code>fraction</code></td><td>How far along the ray it got. <code>1</code> means nothing was hit.</td></tr><tr><td><code>hit</code></td><td>Whether it hit anything at all.</td></tr><tr><td><code>endpos</code> &middot; <code>start</code></td><td><code>{ x, y, z }</code> of where it stopped and started.</td></tr><tr><td><code>normal</code> &middot; <code>plane_dist</code></td><td>The surface it struck, as a plane.</td></tr><tr><td><code>entity</code></td><td>The entity hit, or absent for world geometry.</td></tr><tr><td><code>hitgroup</code> &middot; <code>hitbox</code></td><td>Where on a player it landed.</td></tr><tr><td><code>contents</code></td><td>Content bits at the impact.</td></tr><tr><td><code>surface</code></td><td>Material name, e.g. <code>concrete/concretefloor01</code>.</td></tr><tr><td><code>material</code></td><td>A character code &mdash; look it up in <code>enums.material</code>.</td></tr><tr><td><code>surface_flags</code></td><td>Raw surface flags.</td></tr><tr><td><code>allsolid</code> &middot; <code>startsolid</code></td><td>The ray began inside geometry.</td></tr></tbody></table></div><p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">what trace.bullet gives you</p><div class="tw"><table><thead><tr><th>key</th><th>meaning</th></tr></thead><tbody><tr><td><code>hit</code></td><td>Whether a bullet would reach them.</td></tr><tr><td><code>damage</code></td><td>Damage on arrival, after falloff, armour and walls.</td></tr><tr><td><code>hitgroup</code></td><td>Which hitgroup it would land on.</td></tr><tr><td><code>pen_left</code></td><td>Penetration budget remaining. <code>4</code> means nothing was crossed.</td></tr></tbody></table></div><div class="evt"><div class="evt-h"><h2>example</h2><span class="sigline"></span></div><div class="evt-d"><p>Draw a dot where you&rsquo;re looking.</p></div><pre><span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
+    <span class="k">local</span> me = <span class="f">entity.get_local_player</span>( )
+    <span class="k">if</span> <span class="k">not</span> me <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> eye = me:<span class="f">get_origin</span>( )
+    eye[ <span class="n">3</span> ] = eye[ <span class="n">3</span> ] + <span class="n">64</span>
+
+    <span class="k">local</span> t = <span class="f">trace.line</span>( eye[ <span class="n">1</span> ], eye[ <span class="n">2</span> ], eye[ <span class="n">3</span> ],
+                          eye[ <span class="n">1</span> ] + <span class="n">4096</span>, eye[ <span class="n">2</span> ], eye[ <span class="n">3</span> ] )
+
+    <span class="k">if</span> <span class="k">not</span> t <span class="k">or</span> <span class="k">not</span> t.hit <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> s = <span class="f">render.world_to_screen</span>( t.endpos[ <span class="n">1</span> ], t.endpos[ <span class="n">2</span> ], t.endpos[ <span class="n">3</span> ] )
+    <span class="k">if</span> s <span class="k">then</span>
+        <span class="f">render.circle</span>( s[ <span class="n">1</span> ], s[ <span class="n">2</span> ], <span class="n">4</span>, <span class="n">16</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span> )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre></div>
+<div class="note "><strong>These need a loaded map.</strong> Outside one they return <code>nil</code> rather than pretending everything is empty space.</div><div class="note warn">Traces are not free. A handful per frame is nothing; a few hundred will cost you frames.</div>
+  </div>
+
+  <div class="page" id="p-net">
+    <p class="kicker">world</p>
+    <h1>net</h1>
+    <div class="intro"><p>What the connection is actually doing: ticks, choke, latency.</p></div>
+    <div class="entry"><div class="sig"><b>net.server_tick</b>( ) <em>&middot;</em> <b>net.client_tick</b>( ) <em>&middot;</em> <b>net.delta_tick</b>( )</div><div class="desc">The last tick the server told us about, our own clock, and the delta the last update was built against.</div></div>
+<div class="entry"><div class="sig"><b>net.choked_commands</b>( )</div><div class="desc">Commands built but not sent yet &mdash; the fake lag currently in flight. This is the <b>engine&rsquo;s</b> count, the one the server will act on.</div></div>
+<div class="entry"><div class="sig"><b>net.our_choke</b>( ) <em>&middot;</em> <b>net.our_max_choke</b>( )</div><div class="desc">What <b>soggybot</b> chose this tick, and its ceiling. Normally the same as <code>net.choked_commands()</code>; when they differ, the cheat has decided something the engine hasn&rsquo;t acted on yet.</div></div>
+<div class="entry"><div class="sig"><b>net.last_outgoing_command</b>( ) <em>&middot;</em> <b>net.last_command_ack</b>( )</div><div class="desc">The newest command we sent, and the newest the server has confirmed. The gap is what&rsquo;s in flight.</div></div>
+<div class="entry"><div class="sig"><b>net.latency</b>( <em>[flow]</em> ) <em>&middot;</em> <b>net.avg_latency</b>( <em>[flow]</em> )</div><div class="desc">Seconds, not milliseconds. <code>flow</code> defaults to <code>enums.flow.outgoing</code>, which is the half people mean by &ldquo;ping&rdquo;.</div></div>
+<div class="entry"><div class="sig"><b>net.interp</b>( )</div><div class="desc">The interpolation amount the cheat uses when deciding whether a backtrack record is still valid.</div></div>
+<div class="entry"><div class="sig"><b>net.choked_packets</b>( ) <em>&middot;</em> <b>net.sequence</b>( )</div><div class="desc">Channel-level counters. <code>sequence</code> gives <code>{ out, in, out_ack }</code>.</div></div>
+<div class="entry"><div class="sig"><b>net.address</b>( ) <em>&middot;</em> <b>net.is_loopback</b>( )</div><div class="desc">Server address, and whether it&rsquo;s a local server or a demo.</div></div>
+<div class="entry"><div class="sig"><b>net.is_in_game</b>( ) <em>&middot;</em> <b>net.is_connected</b>( )</div><div class="desc"><code>is_connected</code> is already true while still loading.</div></div>
+<div class="note "><strong><code>net.client_tick()</code> and <code>globals.tickcount()</code> normally agree.</strong> They only come apart while the ping reducer is running, which moves the game&rsquo;s clock forward to read the newest snapshot early.</div><div class="note ">Every value here is read from the engine when you ask for it, so these are honest from <code>paint</code> and the net update events too &mdash; not just the move events.</div>
+  </div>
+
+  <div class="page" id="p-cvar">
+    <p class="kicker">world</p>
+    <h1>cvar</h1>
+    <div class="intro"><p>Read and write game settings.</p></div>
+    <div class="entry"><div class="sig"><b>cvar.find</b>( <i>name</i> ) <em>&rarr; convar | nil</em></div><div class="desc"><code>nil</code> if there&rsquo;s no such convar. Console <b>commands</b> (<code>quit</code>, <code>clear</code>&hellip;) are not convars and give <code>nil</code> too.</div></div>
+<div class="entry"><div class="sig"><b>cvar.</b><i>name</i></div><div class="desc">Shorthand for the same thing. <code>cvar.sv_gravity:get_float()</code>.</div></div>
+<p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">reading</p><div class="entry"><div class="sig"><b>c:get_int</b>( ) <em>&middot;</em> <b>get_float</b>( ) <em>&middot;</em> <b>get_bool</b>( ) <em>&middot;</em> <b>get_string</b>( )</div><div class="desc">The value, however you want it.</div></div>
+<div class="entry"><div class="sig"><b>c:get_flags</b>( ) <em>&middot;</em> <b>c:get_help</b>( ) <em>&middot;</em> <b>c:get_default</b>( )</div><div class="desc">Flags are a bitfield &mdash; see <code>enums.fcvar</code>.</div></div>
+<div class="entry"><div class="sig"><b>c:get_min</b>( ) <em>&middot;</em> <b>c:get_max</b>( )</div><div class="desc"><code>nil</code> when the convar has no bound on that side.</div></div>
+<div class="entry"><div class="sig"><b>c:name</b>( ) <em>&middot;</em> <b>c:valid</b>( )</div><div class="desc">Its name, and whether it still resolves.</div></div>
+<p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">writing</p><div class="entry"><div class="sig"><b>c:set</b>( <i>value</i> ) <em>&rarr; bool</em></div><div class="desc">Takes a number, a string or a boolean. Returns <code>false</code> and says why in console if the write was refused.</div></div>
+<p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">what gets refused, and why</p><div class="tw"><table><thead><tr><th>kind</th><th>what happens</th></tr></thead><tbody><tr><td>Replicated convars<br><span style='opacity:.7'><code>sv_gravity</code>, <code>sv_maxunlag</code>, <code>weapon_recoil_scale</code>&hellip;</span></td><td><b>Refused.</b> The server owns these. Writing one changes your copy only, so your movement and the aimbot&rsquo;s maths quietly stop matching the server &mdash; until it resends and your change vanishes.</td></tr><tr><td>Convars soggybot drives<br><span style='opacity:.7'><code>cl_interp</code>, <code>cl_predict</code>, <code>fog_*</code>, <code>name</code>&hellip;</span></td><td><b>Refused.</b> Something re-stamps these every frame, or the cheat reads them and assumes it&rsquo;s the only writer. You&rsquo;d be fighting it and losing.</td></tr><tr><td>Everything else<br><span style='opacity:.7'><code>fps_max</code>, <code>viewmodel_*</code>, <code>crosshair</code>&hellip;</span></td><td>Allowed.</td></tr></tbody></table></div><div class="evt"><div class="evt-h"><h2>example</h2><span class="sigline"></span></div><div class="evt-d"><p>Read a value the cheat also cares about.</p></div><pre><span class="k">local</span> g = <span class="f">cvar.find</span>( <span class="s">&quot;sv_gravity&quot;</span> )
+<span class="k">if</span> g <span class="k">then</span>
+    <span class="f">print</span>( <span class="s">&quot;gravity is&quot;</span>, g:<span class="f">get_float</span>( ) )
+<span class="k">end</span>
+
+<span class="c">-- shorthand, same thing</span>
+<span class="f">print</span>( cvar.fps_max:<span class="f">get_int</span>( ) )</pre></div>
+<div class="note warn"><strong>The <code>cvar.name</code> shorthand is sharper than it looks.</strong> A typo gives you <code>nil</code>, and calling a method on <code>nil</code> raises &mdash; which unloads your whole script. <code>cvar.find()</code> lets you check first.</div><div class="note ">Lookups are remembered after the first one, so calling <code>cvar.find</code> every frame is fine.</div>
+  </div>
+
+  <div class="page" id="p-plist">
+    <p class="kicker">world</p>
+    <h1>playerlist</h1>
+    <div class="intro"><p>Who&rsquo;s on the server, and who the aimbot should leave alone. The same list the <b>plist</b> tab shows.</p></div>
+    <div class="entry"><div class="sig"><b>playerlist.get_all</b>( <em>[enemies_only]</em> ) <em>&rarr; table</em></div><div class="desc">Everyone on the server, as an array.</div></div>
+<div class="entry"><div class="sig"><b>playerlist.get</b>( <i>index</i> ) <em>&rarr; table | nil</em></div><div class="desc">One player by entity index.</div></div>
+<div class="entry"><div class="sig"><b>playerlist.is_whitelisted</b>( <i>index</i> ) <em>&rarr; bool</em></div><div class="desc">Whether the aimbot is ignoring them.</div></div>
+<div class="entry"><div class="sig"><b>playerlist.set_whitelist</b>( <i>index, bool</i> ) <em>&middot;</em> <b>playerlist.toggle_whitelist</b>( <i>index</i> )</div><div class="desc">Both return the resulting state. Saved to disk straight away.</div></div>
+<div class="entry"><div class="sig"><b>playerlist.saved</b>( ) <em>&rarr; table</em></div><div class="desc">The stored whitelist, including people who aren&rsquo;t here right now. Each entry has <code>steamid</code> and the last <code>name</code> we saw them use.</div></div>
+<div class="entry"><div class="sig"><b>playerlist.forget</b>( <i>steamid</i> ) <em>&middot;</em> <b>playerlist.clear</b>( )</div><div class="desc">Drop one stored entry, or all of them.</div></div>
+<p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">a player entry</p><div class="tw"><table><thead><tr><th>key</th><th>meaning</th></tr></thead><tbody><tr><td><code>index</code> &middot; <code>name</code></td><td>Entity index and current name.</td></tr><tr><td><code>player</code></td><td>The <a href='#entity' data-p='entity' class='xref'>entity</a>, for everything else.</td></tr><tr><td><code>steamid</code></td><td>A <b>string</b>, always &mdash; see the warning below.</td></tr><tr><td><code>enemy</code> &middot; <code>bot</code></td><td>Whether they&rsquo;re on the other team, and whether they&rsquo;re a bot.</td></tr><tr><td><code>alive</code> &middot; <code>dormant</code></td><td><code>dormant</code> means the server has stopped sending us their updates.</td></tr><tr><td><code>whitelisted</code></td><td>Whether the aimbot is ignoring them.</td></tr></tbody></table></div><div class="evt"><div class="evt-h"><h2>example</h2><span class="sigline"></span></div><div class="evt-d"><p>Ignore everyone who is winning.</p></div><pre><span class="f">callbacks.add</span>( <span class="s">&quot;player_death&quot;</span>, <span class="k">function</span>( e )
+    <span class="k">local</span> victim = e:<span class="f">get_player</span>( <span class="s">&quot;userid&quot;</span> )
+    <span class="k">if</span> <span class="k">not</span> victim <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">for</span> _, p <span class="k">in</span> <span class="f">ipairs</span>( <span class="f">playerlist.get_all</span>( <span class="k">true</span> ) ) <span class="k">do</span>
+        <span class="k">if</span> p.player:<span class="f">get_health</span>( ) &gt; <span class="n">90</span> <span class="k">then</span>
+            <span class="f">playerlist.set_whitelist</span>( p.index, <span class="k">true</span> )
+        <span class="k">end</span>
+    <span class="k">end</span>
+<span class="k">end</span> )</pre></div>
+<div class="note warn"><strong>Steam IDs are strings, not numbers.</strong> They&rsquo;re bigger than a Lua number can hold exactly, so passing one around as a number silently rounds it and you end up whitelisting the wrong person.</div><div class="note "><strong>Whitelisting stops the aimbot targeting them. Nothing else changes.</strong> ESP still draws them, the resolver still works on them, and the anti aim still treats them as someone who can see you &mdash; which is what you want, because they can.</div><div class="note ">Bots are only whitelisted for the current session. They have no Steam account to remember them by.</div>
   </div>
 
   <div class="page" id="p-globals">
