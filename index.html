@@ -259,6 +259,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
         <a href="#obj-shot" data-p="obj-shot">shot</a>
         <a href="#obj-esp" data-p="obj-esp">esp</a>
         <a href="#obj-event" data-p="obj-event">game event</a>
+        <a href="#obj-uiitem" data-p="obj-uiitem">ui item</a>
       </div>
     </div>
     <div class="navgrp">
@@ -313,7 +314,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
 <span class="k">local</span> enabled = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;my script&quot;</span>, <span class="k">true</span> )
 
 <span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
-    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( enabled ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+    <span class="k">if</span> <span class="k">not</span> enabled:<span class="f">get</span>( ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
     <span class="f">render.text</span>( <span class="n">10</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">&quot;hello&quot;</span> )
 <span class="k">end</span> )</pre>
   </div>
@@ -540,6 +541,25 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
 <div class="note "><strong>Only valid inside the callback.</strong> The game reuses the event object immediately afterwards.</div>
   </div>
 
+  <div class="page" id="p-obj-uiitem">
+    <p class="kicker">objects</p>
+    <h1>ui item</h1>
+    <div class="intro"><p>What every <a href='#ui' data-p='ui' class='xref'>ui</a> constructor returns. A control that has been destroyed stays safe &mdash; its methods just do nothing.</p></div>
+    <div class="entry"><div class="sig"><b>item:get</b>( )</div><div class="desc">The control&rsquo;s value, typed by what it actually is: boolean for a checkbox, number for a slider or combobox, live on/off for a hotkey, <code>{r,g,b,a}</code> for a colour picker, an array of indices for a multiselect.</div></div>
+<div class="entry"><div class="sig"><b>item:set</b>( <i>value</i> )</div><div class="desc">Write it back, same types.</div></div>
+<div class="entry"><div class="sig"><b>item:set_visible</b>( <i>bool</i> )</div><div class="desc">Show or hide. Re-read every frame, so flip it freely.</div></div>
+<div class="entry"><div class="sig"><b>item:set_callback</b>( <i>fn</i> )</div><div class="desc">Runs when the value changes. One per control &mdash; setting it again replaces the old one.</div></div>
+<div class="entry"><div class="sig"><b>item:set_subtab</b>( <i>page</i> )</div><div class="desc">Move it onto a page from <code>ui.subtab</code>.</div></div>
+<div class="entry"><div class="sig"><b>item:name</b>( ) <em>&middot;</em> <b>item:valid</b>( )</div><div class="desc">Its label, and whether it still exists.</div></div>
+<pre><span class="k">local</span> mode  = <span class="f">ui.combobox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;mode&quot;</span>, <span class="s">&quot;off&quot;</span>, <span class="s">&quot;low&quot;</span>, <span class="s">&quot;high&quot;</span> )
+<span class="k">local</span> power = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;power&quot;</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
+
+<span class="c">-- hide the slider unless a mode is picked</span>
+mode:<span class="f">set_callback</span>( <span class="k">function</span>( )
+    power:<span class="f">set_visible</span>( mode:<span class="f">get</span>( ) ~= <span class="n">0</span> )
+<span class="k">end</span> )</pre><div class="note "><strong>Values save automatically</strong> with the config, and load correctly even if the config was loaded before your script was.</div>
+  </div>
+
   <div class="page" id="p-ui">
     <p class="kicker">menu</p>
     <h1>ui</h1>
@@ -552,15 +572,12 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
 <div class="entry"><div class="sig"><b>ui.color_picker</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <em>[r]</em>, <em>[g]</em>, <em>[b]</em>, <em>[a]</em> )</div><div class="desc"><code>ui.get</code> gives <code>{r,g,b,a}</code>.</div></div>
 <div class="entry"><div class="sig"><b>ui.button</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>fn</i> )</div><div class="desc">Runs <code>fn</code> when clicked.</div></div>
 <div class="entry"><div class="sig"><b>ui.intbox</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc">Number entry field.</div></div>
-<div class="entry"><div class="sig"><b>ui.get</b>( <i>handle</i> ) <em>&middot;</em> <b>ui.set</b>( <i>handle</i>, <i>value</i> )</div><div class="desc">Read and write a control&rsquo;s value.</div></div>
-<div class="entry"><div class="sig"><b>ui.name</b>( <i>handle</i> ) <em>&middot;</em> <b>ui.set_visible</b>( <i>handle</i>, <i>bool</i> )</div><div class="desc">Label, and show/hide.</div></div>
-<div class="entry"><div class="sig"><b>ui.set_callback</b>( <i>handle</i>, <i>fn</i> )</div><div class="desc">Runs when the value changes. One per control &mdash; setting it again replaces the old one.</div></div>
-<pre><span class="k">local</span> mode  = <span class="f">ui.combobox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;mode&quot;</span>, <span class="s">&quot;off&quot;</span>, <span class="s">&quot;low&quot;</span>, <span class="s">&quot;high&quot;</span> )
+<div class="note "><strong>Everything you do <em>to</em> a control is a method on it</strong> &mdash; <code>get</code>, <code>set</code>, <code>set_visible</code>, <code>set_callback</code>, <code>set_subtab</code>. See <a href='#obj-uiitem' data-p='obj-uiitem' class='xref'>ui item</a>.</div><pre><span class="k">local</span> mode  = <span class="f">ui.combobox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;mode&quot;</span>, <span class="s">&quot;off&quot;</span>, <span class="s">&quot;low&quot;</span>, <span class="s">&quot;high&quot;</span> )
 <span class="k">local</span> power = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;power&quot;</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
 
 <span class="c">-- hide the slider unless a mode is picked</span>
-<span class="f">ui.set_callback</span>( mode, <span class="k">function</span>( )
-    <span class="f">ui.set_visible</span>( power, <span class="f">ui.get</span>( mode ) ~= <span class="n">0</span> )
+mode:<span class="f">set_callback</span>( <span class="k">function</span>( )
+    power:<span class="f">set_visible</span>( mode:<span class="f">get</span>( ) ~= <span class="n">0</span> )
 <span class="k">end</span> )</pre><div class="note "><strong>Values save automatically</strong> with the config, and load correctly even if the config was loaded before your script was.</div>
   </div>
 
@@ -574,8 +591,8 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
 <span class="k">local</span> key   = <span class="f">ui.hotkey</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;key&quot;</span> )
 <span class="k">local</span> speed = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;speed&quot;</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
 
-<span class="f">ui.set_subtab</span>( key, page )
-<span class="f">ui.set_subtab</span>( speed, page )</pre><div class="tw"><table><thead><tr><th></th><th>where your controls show up</th></tr></thead><tbody><tr><td><strong>with a subtab</strong></td><td>Your own page, both columns.</td></tr><tr><td><strong>without</strong></td><td>The main page, column 1, only while your script is selected in the list.</td></tr></tbody></table></div>
+key:<span class="f">set_subtab</span>( page )
+speed:<span class="f">set_subtab</span>( page )</pre><div class="tw"><table><thead><tr><th></th><th>where your controls show up</th></tr></thead><tbody><tr><td><strong>with a subtab</strong></td><td>Your own page, both columns.</td></tr><tr><td><strong>without</strong></td><td>The main page, column 1, only while your script is selected in the list.</td></tr></tbody></table></div>
   </div>
 
   <div class="page" id="p-render">
@@ -629,6 +646,8 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <div class="entry"><div class="sig"><b>e:is_player</b>( ) <em>&middot;</em> <b>e:is_dormant</b>( ) <em>&middot;</em> <b>e:index</b>( ) <em>&middot;</em> <b>e:valid</b>( )</div><div class="desc">Identity checks.</div></div>
 <div class="entry"><div class="sig"><b>e:get_origin</b>( ) <em>&rarr; {x,y,z}</em></div><div class="desc">World position.</div></div>
 <div class="entry"><div class="sig"><b>e:get_weapon</b>( ) <em>&rarr; weapon | nil</em></div><div class="desc">Their current weapon.</div></div>
+<div class="entry"><div class="sig"><b>e:get_animlayers</b>( ) <em>&rarr; table</em></div><div class="desc">All 13 animation layers, keyed <code>0..12</code>. Name them with <code>enums.animlayer</code>.</div></div>
+<div class="entry"><div class="sig"><b>e:get_animlayer</b>( <i>index</i> ) <em>&rarr; table | nil</em></div><div class="desc">Just one layer.</div></div>
 <pre><span class="k">for</span> _, p <span class="k">in</span> <span class="f">ipairs</span>( <span class="f">entity.get_players</span>( <span class="k">true</span> ) ) <span class="k">do</span>
     <span class="k">if</span> <span class="k">not</span> p:<span class="f">is_dormant</span>( ) <span class="k">then</span>
         <span class="k">local</span> o = p:<span class="f">get_origin</span>( )
@@ -639,7 +658,14 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
                 p:<span class="f">get_name</span>( <span class="n">10</span> ) )
         <span class="k">end</span>
     <span class="k">end</span>
-<span class="k">end</span></pre><div class="note ">If an entity stops existing, its functions return <code>nil</code> instead of crashing.</div>
+<span class="k">end</span></pre><div class="note ">If an entity stops existing, its functions return <code>nil</code> instead of crashing.</div><p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">animation layers</p><pre><span class="k">local</span> layers = p:<span class="f">get_animlayers</span>( )
+
+<span class="k">for</span> i = <span class="n">0</span>, <span class="n">12</span> <span class="k">do</span>
+    <span class="k">local</span> l = layers[ i ]
+    <span class="k">if</span> l <span class="k">and</span> l.weight &gt; <span class="n">0</span> <span class="k">then</span>
+        <span class="f">print</span>( enums.animlayer[ i ], l.sequence, l.weight, l.cycle )
+    <span class="k">end</span>
+<span class="k">end</span></pre><div class="note ">Each layer has <code>sequence</code>, <code>cycle</code>, <code>prev_cycle</code>, <code>weight</code>, <code>weight_delta</code>, <code>playback_rate</code>, <code>anim_time</code>, <code>fade_out_time</code> and <code>order</code>.</div><div class="note warn"><strong>Your own layers come from what the cheat drove this tick</strong>, not from the entity&rsquo;s raw overlay &mdash; so a script and the cheat agree on them. Everyone else&rsquo;s come from their overlay.</div>
   </div>
 
   <div class="page" id="p-netprops">
@@ -699,6 +725,7 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <div class="entry"><div class="sig"><b>enums.hitgroup</b>[ <i>id</i> ]</div><div class="desc"><code>generic</code>, <code>head</code>, <code>chest</code>, <code>stomach</code>, <code>left arm</code>, <code>right arm</code>, <code>left leg</code>, <code>right leg</code>, <code>neck</code>, <code>gear</code>.</div></div>
 <div class="entry"><div class="sig"><b>enums.hitbox</b>[ <i>id</i> ]</div><div class="desc">All 20 hitboxes &mdash; <code>head</code>, <code>neck</code>, <code>pelvis</code>, <code>thorax</code>, <code>chest</code>, the limbs&hellip;</div></div>
 <div class="entry"><div class="sig"><b>enums.hitbox_id</b>[ <i>name</i> ]</div><div class="desc">The reverse &mdash; name to number.</div></div>
+<div class="entry"><div class="sig"><b>enums.animlayer</b>[ <i>id</i> ] <em>&middot;</em> <b>enums.animlayer_id</b>[ <i>name</i> ]</div><div class="desc">The 13 animation layers &mdash; <code>aimmatrix</code>, <code>weapon action</code>, <code>adjust</code>, <code>jump or fall</code>, <code>move</code>, <code>lean</code>&hellip;</div></div>
 <div class="entry"><div class="sig"><b>enums.font_flags</b> <em>&middot;</em> <b>enums.font_aa</b></div><div class="desc">Font creation flags and smoothing modes.</div></div>
 <pre>cmd:<span class="f">strip_button</span>( enums.buttons.IN_JUMP )
 
@@ -722,7 +749,7 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
     <h1>gotchas</h1>
     <div class="entry"><div class="sig"><b>predicted values depend on when you read them</b></div><div class="desc"><code>get_inaccuracy</code>, <code>get_spread</code>, <code>get_mode</code> and <code>can_fire</code> are predicted. In <code>pre_move</code> they&rsquo;re a tick behind; in <code>in_move</code> they&rsquo;re current.</div></div>
 <div class="entry"><div class="sig"><b>objects only live inside their callback</b></div><div class="desc"><code>cmd</code>, <code>shot</code>, the esp context and game events all stop working once the callback returns. Copy out what you need.</div></div>
-<div class="entry"><div class="sig"><b>one set_callback per control</b></div><div class="desc">Calling <code>ui.set_callback</code> twice on the same handle replaces the first one.</div></div>
+<div class="entry"><div class="sig"><b>one set_callback per control</b></div><div class="desc">Calling <code>set_callback</code> twice on the same control replaces the first one.</div></div>
 <div class="entry"><div class="sig"><b>drawing only works in paint and player_esp</b></div><div class="desc">Except <code>box3d</code> and <code>capsule3d</code>, which you call once with a duration.</div></div>
 <div class="entry"><div class="sig"><b>errors unload your script</b></div><div class="desc">The error prints to console. This stops a broken script spamming every frame.</div></div>
 <div class="entry"><div class="sig"><b>column 0 vs column 1</b></div><div class="desc">Without a subtab, column 0 is taken by the script list &mdash; use column 1. With a subtab, both are yours.</div></div>
@@ -739,9 +766,9 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <span class="k">local</span> font = <span class="f">render.create_font</span>( <span class="s">&quot;Verdana&quot;</span>, <span class="n">14</span>, <span class="n">500</span> )
 
 <span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
-    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( on ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+    <span class="k">if</span> <span class="k">not</span> on:<span class="f">get</span>( ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
 
-    <span class="k">local</span> c    = <span class="f">ui.get</span>( col )
+    <span class="k">local</span> c    = col:<span class="f">get</span>( )
     <span class="k">local</span> text = <span class="f">string.format</span>( <span class="s">&quot;soggybot | %d fps&quot;</span>,
                     <span class="n">1</span> / <span class="f">math.max</span>( <span class="f">globals.frametime</span>( ), <span class="n">0.0001</span> ) )
 
@@ -777,7 +804,7 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <span class="k">end</span> )</pre><p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">esp flags</p><pre><span class="k">local</span> on = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;extra flags&quot;</span>, <span class="k">true</span> )
 
 <span class="f">callbacks.add</span>( <span class="s">&quot;player_esp&quot;</span>, <span class="k">function</span>( ctx )
-    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( on ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+    <span class="k">if</span> <span class="k">not</span> on:<span class="f">get</span>( ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
 
     <span class="k">local</span> p = ctx:<span class="f">get_player</span>( )
 
@@ -793,13 +820,13 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <span class="k">local</span> key   = <span class="f">ui.hotkey</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;slowwalk key&quot;</span> )
 <span class="k">local</span> speed = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;speed&quot;</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
 
-<span class="f">ui.set_subtab</span>( key, page )
-<span class="f">ui.set_subtab</span>( speed, page )
+key:<span class="f">set_subtab</span>( page )
+speed:<span class="f">set_subtab</span>( page )
 
 <span class="f">callbacks.add</span>( <span class="s">&quot;pre_move&quot;</span>, <span class="k">function</span>( cmd )
-    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( key ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+    <span class="k">if</span> <span class="k">not</span> key:<span class="f">get</span>( ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
 
-    <span class="k">local</span> want = <span class="f">ui.get</span>( speed )
+    <span class="k">local</span> want = speed:<span class="f">get</span>( )
     <span class="k">local</span> f, s = cmd:<span class="f">get_forwardmove</span>( ), cmd:<span class="f">get_sidemove</span>( )
     <span class="k">local</span> len  = <span class="f">math.sqrt</span>( f * f + s * s )
 
