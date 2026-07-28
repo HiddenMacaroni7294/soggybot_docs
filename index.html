@@ -78,6 +78,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
 
 nav a{display:block;padding:5px 9px;border-radius:6px;text-decoration:none;
   color:var(--ink-2);font-size:13.5px;border-left:2px solid transparent;cursor:pointer}
+nav a:visited{color:var(--ink-2)}
 nav a:hover{background:var(--panel-2);color:var(--ink)}
 nav a.on{color:var(--ink);border-left-color:var(--accent);background:var(--panel-2);font-weight:600}
 nav a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
@@ -178,14 +179,27 @@ pre::-webkit-scrollbar{height:8px}
 pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
 .side::-webkit-scrollbar-thumb{border-color:var(--bg)}
 
-/* cross-references. a colour change alone gives no hint these are clickable. */
+/* cross-references. these are real anchors with an href so the browser gives
+   the pointer cursor, keyboard focus and middle-click for free — an <a> with no
+   href gets none of that. the underline is a plain text-decoration rather than a
+   color-mix border, which silently drops the whole declaration where unsupported. */
 .xref{
-  color:var(--accent);cursor:pointer;text-decoration:none;white-space:nowrap;
-  border-bottom:1px solid color-mix(in srgb,var(--accent) 45%,transparent);
+  color:var(--accent);
+  cursor:pointer;
+  white-space:nowrap;
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:2px;
+  text-decoration-color:rgba(255,178,0,.55);
 }
-.xref:hover{border-bottom-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
-.xref:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
-.xref::after{content:"\2197";font-size:.78em;margin-left:2px;opacity:.75;vertical-align:1px}
+.xref:hover{
+  text-decoration-color:var(--accent);
+  text-decoration-thickness:2px;
+  background:rgba(255,178,0,.12);
+  border-radius:3px;
+}
+.xref:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.xref::after{content:"\2197";font-size:.78em;margin-left:2px;opacity:.8;vertical-align:1px;text-decoration:none}
 
 /* collapsible nav groups */
 .navgrp{margin-bottom:1px}
@@ -223,66 +237,66 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
     <div class="navgrp" data-open>
       <button class="grp" aria-expanded="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>start</button>
       <div class="grpitems">
-        <a data-p="overview">overview</a>
-        <a data-p="callbacks">callbacks</a>
-        <a data-p="examples">examples</a>
+        <a href="#overview" data-p="overview">overview</a>
+        <a href="#callbacks" data-p="callbacks">callbacks</a>
+        <a href="#examples" data-p="examples">examples</a>
       </div>
     </div>
     <div class="navgrp">
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>events</button>
       <div class="grpitems">
-        <a data-p="ev-move">move</a>
-        <a data-p="ev-visual">paint &amp; esp</a>
-        <a data-p="ev-aim">aimbot</a>
-        <a data-p="ev-game">game</a>
-        <a data-p="ev-world">world</a>
+        <a href="#ev-move" data-p="ev-move">move</a>
+        <a href="#ev-visual" data-p="ev-visual">paint &amp; esp</a>
+        <a href="#ev-aim" data-p="ev-aim">aimbot</a>
+        <a href="#ev-game" data-p="ev-game">game</a>
+        <a href="#ev-world" data-p="ev-world">world</a>
       </div>
     </div>
     <div class="navgrp">
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>objects</button>
       <div class="grpitems">
-        <a data-p="obj-cmd">cmd</a>
-        <a data-p="obj-shot">shot</a>
-        <a data-p="obj-esp">esp</a>
-        <a data-p="obj-event">game event</a>
+        <a href="#obj-cmd" data-p="obj-cmd">cmd</a>
+        <a href="#obj-shot" data-p="obj-shot">shot</a>
+        <a href="#obj-esp" data-p="obj-esp">esp</a>
+        <a href="#obj-event" data-p="obj-event">game event</a>
       </div>
     </div>
     <div class="navgrp">
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>menu</button>
       <div class="grpitems">
-        <a data-p="ui">ui</a>
-        <a data-p="subtabs">subtabs</a>
+        <a href="#ui" data-p="ui">ui</a>
+        <a href="#subtabs" data-p="subtabs">subtabs</a>
       </div>
     </div>
     <div class="navgrp">
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>rendering</button>
       <div class="grpitems">
-        <a data-p="render">render</a>
-        <a data-p="fonts">fonts</a>
+        <a href="#render" data-p="render">render</a>
+        <a href="#fonts" data-p="fonts">fonts</a>
       </div>
     </div>
     <div class="navgrp">
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>entities</button>
       <div class="grpitems">
-        <a data-p="entity">entity</a>
-        <a data-p="netprops">netprops</a>
-        <a data-p="weapon">weapon</a>
-        <a data-p="wpndata">weapon data</a>
+        <a href="#entity" data-p="entity">entity</a>
+        <a href="#netprops" data-p="netprops">netprops</a>
+        <a href="#weapon" data-p="weapon">weapon</a>
+        <a href="#wpndata" data-p="wpndata">weapon data</a>
       </div>
     </div>
     <div class="navgrp">
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>misc</button>
       <div class="grpitems">
-        <a data-p="globals">globals</a>
-        <a data-p="client">client</a>
-        <a data-p="enums">enums</a>
-        <a data-p="ffi">ffi</a>
+        <a href="#globals" data-p="globals">globals</a>
+        <a href="#client" data-p="client">client</a>
+        <a href="#enums" data-p="enums">enums</a>
+        <a href="#ffi" data-p="ffi">ffi</a>
       </div>
     </div>
     <div class="navgrp">
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>reference</button>
       <div class="grpitems">
-        <a data-p="gotchas">gotchas</a>
+        <a href="#gotchas" data-p="gotchas">gotchas</a>
       </div>
     </div>
   </nav>
@@ -310,13 +324,13 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
     <div class="intro"><p>Hook an event and your function runs whenever it fires. You can add as many handlers as you like, and every script&rsquo;s handlers are independent.</p></div>
     <div class="entry"><div class="sig"><b>callbacks.add</b>( <i>event</i>, <i>fn</i> )</div><div class="desc">Register a handler. Returns <code>false</code> and logs if the event name doesn&rsquo;t exist.</div></div>
 <div class="entry"><div class="sig"><b>callbacks.remove</b>( <i>event</i> )</div><div class="desc">Remove every handler your script added for that event.</div></div>
-<div class="tw"><table><thead><tr><th>group</th><th>events</th></tr></thead><tbody><tr><td><a data-p='ev-move' class='xref'>move</a></td><td><code>pre_move</code> <code>in_move</code> <code>post_move</code></td></tr><tr><td><a data-p='ev-visual' class='xref'>visuals</a></td><td><code>paint</code> <code>player_esp</code></td></tr><tr><td><a data-p='ev-aim' class='xref'>aimbot</a></td><td><code>aim_fire</code> <code>aim_hit</code> <code>aim_miss</code></td></tr><tr><td><a data-p='ev-game' class='xref'>game</a></td><td><code>player_hurt</code>, <code>player_death</code>, and any other game event</td></tr><tr><td><a data-p='ev-world' class='xref'>world</a></td><td><code>net_update_start</code> <code>net_update_end</code> <code>level_init</code> <code>level_shutdown</code></td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th>group</th><th>events</th></tr></thead><tbody><tr><td><a href='#ev-move' data-p='ev-move' class='xref'>move</a></td><td><code>pre_move</code> <code>in_move</code> <code>post_move</code></td></tr><tr><td><a href='#ev-visual' data-p='ev-visual' class='xref'>visuals</a></td><td><code>paint</code> <code>player_esp</code></td></tr><tr><td><a href='#ev-aim' data-p='ev-aim' class='xref'>aimbot</a></td><td><code>aim_fire</code> <code>aim_hit</code> <code>aim_miss</code></td></tr><tr><td><a href='#ev-game' data-p='ev-game' class='xref'>game</a></td><td><code>player_hurt</code>, <code>player_death</code>, and any other game event</td></tr><tr><td><a href='#ev-world' data-p='ev-world' class='xref'>world</a></td><td><code>net_update_start</code> <code>net_update_end</code> <code>level_init</code> <code>level_shutdown</code></td></tr></tbody></table></div>
   </div>
 
   <div class="page" id="p-ev-move">
     <p class="kicker">events</p>
     <h1>move events</h1>
-    <div class="intro"><p>Three moments in the same tick, each handed the same <a data-p='obj-cmd' class='xref'>cmd</a> object.</p></div>
+    <div class="intro"><p>Three moments in the same tick, each handed the same <a href='#obj-cmd' data-p='obj-cmd' class='xref'>cmd</a> object.</p></div>
     <div class="evt"><div class="evt-h"><h2>pre_move</h2><span class="sigline">function( cmd )</span></div><div class="evt-d"><p>The start of a tick, before the cheat has touched anything. Change movement or buttons here and the rest of the cheat sees your version.</p></div><pre><span class="c">-- auto-crouch whenever we jump</span>
 <span class="f">callbacks.add</span>( <span class="s">&quot;pre_move&quot;</span>, <span class="k">function</span>( cmd )
     <span class="k">if</span> cmd:<span class="f">has_button</span>( enums.buttons.IN_JUMP ) <span class="k">then</span>
@@ -352,7 +366,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
     <span class="k">local</span> w, h = <span class="f">render.screen_size</span>( )
     <span class="f">render.text</span>( w - <span class="n">120</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">&quot;soggybot&quot;</span> )
 <span class="k">end</span> )</pre></div>
-<div class="evt"><div class="evt-h"><h2>player_esp</h2><span class="sigline">function( ctx )</span></div><div class="evt-d"><p>Once for every player whose ESP is on screen, after all the built-in elements have drawn &mdash; so anything you draw lands on top. Players who are dormant, faded out or off screen never reach it, so you don&rsquo;t need to filter.</p><p>Handed an <a data-p='obj-esp' class='xref'>esp</a> object.</p></div><pre><span class="f">callbacks.add</span>( <span class="s">&quot;player_esp&quot;</span>, <span class="k">function</span>( ctx )
+<div class="evt"><div class="evt-h"><h2>player_esp</h2><span class="sigline">function( ctx )</span></div><div class="evt-d"><p>Once for every player whose ESP is on screen, after all the built-in elements have drawn &mdash; so anything you draw lands on top. Players who are dormant, faded out or off screen never reach it, so you don&rsquo;t need to filter.</p><p>Handed an <a href='#obj-esp' data-p='obj-esp' class='xref'>esp</a> object.</p></div><pre><span class="f">callbacks.add</span>( <span class="s">&quot;player_esp&quot;</span>, <span class="k">function</span>( ctx )
     <span class="k">local</span> p = ctx:<span class="f">get_player</span>( )
     <span class="k">local</span> x, y, w, h = ctx:<span class="f">get_bbox</span>( )
 
@@ -370,7 +384,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
   <div class="page" id="p-ev-aim">
     <p class="kicker">events</p>
     <h1>aimbot events</h1>
-    <div class="intro"><p>All three are handed a <a data-p='obj-shot' class='xref'>shot</a> object. <code>aim_fire</code> fires immediately; the other two land later, when the server answers.</p></div>
+    <div class="intro"><p>All three are handed a <a href='#obj-shot' data-p='obj-shot' class='xref'>shot</a> object. <code>aim_fire</code> fires immediately; the other two land later, when the server answers.</p></div>
     <div class="evt"><div class="evt-h"><h2>aim_fire</h2><span class="sigline">function( shot )</span></div><div class="evt-d"><p>The aimbot pulled the trigger. Everything about the shot is captured at this moment, including what it aimed at.</p></div><pre><span class="c">-- a fired-shot log</span>
 <span class="f">callbacks.add</span>( <span class="s">&quot;aim_fire&quot;</span>, <span class="k">function</span>( s )
     <span class="k">local</span> t = s:<span class="f">get_target</span>( )
@@ -428,7 +442,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
     <p class="kicker">events</p>
     <h1>game events</h1>
     <div class="intro"><p>Registered by name, same as anything else.</p></div>
-    <div class="evt"><div class="evt-h"><h2>any game event</h2><span class="sigline">function( event )</span></div><div class="evt-d"><p>Any event the game itself has &mdash; <code>player_hurt</code>, <code>player_death</code>, <code>weapon_fire</code>, <code>round_start</code>, <code>item_pickup</code>, and the rest. You don&rsquo;t need the cheat to already listen for it; asking subscribes to it.</p><p>Handed an <a data-p='obj-event' class='xref'>event</a> object.</p></div><pre><span class="c">-- damage we dealt, with the hitgroup named</span>
+    <div class="evt"><div class="evt-h"><h2>any game event</h2><span class="sigline">function( event )</span></div><div class="evt-d"><p>Any event the game itself has &mdash; <code>player_hurt</code>, <code>player_death</code>, <code>weapon_fire</code>, <code>round_start</code>, <code>item_pickup</code>, and the rest. You don&rsquo;t need the cheat to already listen for it; asking subscribes to it.</p><p>Handed an <a href='#obj-event' data-p='obj-event' class='xref'>event</a> object.</p></div><pre><span class="c">-- damage we dealt, with the hitgroup named</span>
 <span class="f">callbacks.add</span>( <span class="s">&quot;player_hurt&quot;</span>, <span class="k">function</span>( e )
     <span class="k">local</span> victim   = e:<span class="f">get_player</span>( <span class="s">&quot;userid&quot;</span> )
     <span class="k">local</span> attacker = e:<span class="f">get_player</span>( <span class="s">&quot;attacker&quot;</span> )
@@ -480,12 +494,12 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
   <div class="page" id="p-obj-cmd">
     <p class="kicker">objects</p>
     <h1>cmd</h1>
-    <div class="intro"><p>Handed to the <a data-p='ev-move' class='xref'>move events</a>. It&rsquo;s how you change what gets sent to the server.</p></div>
+    <div class="intro"><p>Handed to the <a href='#ev-move' data-p='ev-move' class='xref'>move events</a>. It&rsquo;s how you change what gets sent to the server.</p></div>
     <div class="entry"><div class="sig"><b>cmd:get_yaw</b>( ) <em>&middot;</em> <b>cmd:set_yaw</b>( <i>v</i> )</div><div class="desc">Also <code>pitch</code> and <code>roll</code>.</div></div>
 <div class="entry"><div class="sig"><b>cmd:get_forwardmove</b>( ) <em>&middot;</em> <b>cmd:set_forwardmove</b>( <i>v</i> )</div><div class="desc">Also <code>sidemove</code> and <code>upmove</code>.</div></div>
 <div class="entry"><div class="sig"><b>cmd:get_send_packet</b>( ) <em>&middot;</em> <b>cmd:set_send_packet</b>( <i>bool</i> )</div><div class="desc">Whether this tick is sent to the server.</div></div>
 <div class="entry"><div class="sig"><b>cmd:get_weaponselect</b>( ) <em>&middot;</em> <b>cmd:set_weaponselect</b>( <i>v</i> )</div><div class="desc">Weapon switch.</div></div>
-<div class="entry"><div class="sig"><b>cmd:add_button</b>( <i>bit</i> ) <em>&middot;</em> <b>cmd:strip_button</b>( <i>bit</i> ) <em>&middot;</em> <b>cmd:has_button</b>( <i>bit</i> )</div><div class="desc">Add, remove or test a button. See <a data-p='enums' class='xref'>enums</a>.</div></div>
+<div class="entry"><div class="sig"><b>cmd:add_button</b>( <i>bit</i> ) <em>&middot;</em> <b>cmd:strip_button</b>( <i>bit</i> ) <em>&middot;</em> <b>cmd:has_button</b>( <i>bit</i> )</div><div class="desc">Add, remove or test a button. See <a href='#enums' data-p='enums' class='xref'>enums</a>.</div></div>
 <div class="entry"><div class="sig"><b>cmd:get_buttons</b>( ) <em>&middot;</em> <b>cmd:get_command_number</b>( ) <em>&middot;</em> <b>cmd:get_tick</b>( ) <em>&middot;</em> <b>cmd:get_random_seed</b>( )<span class="pill">read only</span></div><div class="desc">Changing these would desync you from the server.</div></div>
 <div class="note warn"><strong><code>IN_ATTACK</code> is handled by the cheat.</strong> You can&rsquo;t remove it &mdash; the aimbot already decided. You can add it, but only when <code>client.can_fire()</code> is true. Both calls return <code>false</code> if the attack bit was ignored.</div><div class="note "><strong>Only use <code>cmd</code> inside the callback that gave it to you.</strong> Don&rsquo;t save it in a variable for later.</div>
   </div>
@@ -493,7 +507,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
   <div class="page" id="p-obj-shot">
     <p class="kicker">objects</p>
     <h1>shot</h1>
-    <div class="intro"><p>Handed to the <a data-p='ev-aim' class='xref'>aimbot events</a>. Everything is captured when the shot is fired, so it still describes that shot when it resolves a moment later.</p></div>
+    <div class="intro"><p>Handed to the <a href='#ev-aim' data-p='ev-aim' class='xref'>aimbot events</a>. Everything is captured when the shot is fired, so it still describes that shot when it resolves a moment later.</p></div>
     <div class="entry"><div class="sig"><b>shot:get_target</b>( ) <em>&rarr; entity | nil</em></div><div class="desc">Who we shot at.</div></div>
 <div class="entry"><div class="sig"><b>shot:get_hitbox</b>( ) <em>&middot;</em> <b>shot:get_hitgroup</b>( )</div><div class="desc">What we <strong>aimed at</strong>. Name them with <code>enums.hitbox</code> / <code>enums.hitgroup</code>.</div></div>
 <div class="entry"><div class="sig"><b>shot:get_hitchance</b>( ) <em>&middot;</em> <b>shot:get_point_hitchance</b>( )</div><div class="desc">The final hitchance, and the aimed point&rsquo;s own.</div></div>
@@ -508,7 +522,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
   <div class="page" id="p-obj-esp">
     <p class="kicker">objects</p>
     <h1>esp</h1>
-    <div class="intro"><p>Handed to <a data-p='ev-visual' class='xref'>player_esp</a>, once per player per frame.</p></div>
+    <div class="intro"><p>Handed to <a href='#ev-visual' data-p='ev-visual' class='xref'>player_esp</a>, once per player per frame.</p></div>
     <div class="entry"><div class="sig"><b>ctx:get_player</b>( ) <em>&rarr; entity</em></div><div class="desc">The player being drawn.</div></div>
 <div class="entry"><div class="sig"><b>ctx:get_bbox</b>( ) <em>&rarr; x, y, w, h</em></div><div class="desc">The box on screen. Always valid &mdash; a player whose box can&rsquo;t be projected never reaches the callback.</div></div>
 <div class="entry"><div class="sig"><b>ctx:add_flag</b>( <i>text</i>, <em>[r]</em>, <em>[g]</em>, <em>[b]</em> )</div><div class="desc">Adds a flag below the built-in ones, in the same column with the same styling.</div></div>
@@ -519,7 +533,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
   <div class="page" id="p-obj-event">
     <p class="kicker">objects</p>
     <h1>game event</h1>
-    <div class="intro"><p>Handed to <a data-p='ev-game' class='xref'>game events</a>.</p></div>
+    <div class="intro"><p>Handed to <a href='#ev-game' data-p='ev-game' class='xref'>game events</a>.</p></div>
     <div class="entry"><div class="sig"><b>e:get_name</b>( )</div><div class="desc">The event&rsquo;s name.</div></div>
 <div class="entry"><div class="sig"><b>e:get_int</b>( <i>key</i> ) <em>&middot;</em> <b>e:get_float</b>( <i>key</i> ) <em>&middot;</em> <b>e:get_bool</b>( <i>key</i> ) <em>&middot;</em> <b>e:get_string</b>( <i>key</i> )</div><div class="desc">Read a field by name. Keys are the game&rsquo;s own &mdash; <code>userid</code>, <code>dmg_health</code>, <code>weapon</code>&hellip;</div></div>
 <div class="entry"><div class="sig"><b>e:get_player</b>( <i>key</i> ) <em>&rarr; entity | nil</em></div><div class="desc">Reads a userid field and gives you the entity. Userids aren&rsquo;t entity indices, so this saves doing the conversion yourself.</div></div>
@@ -582,7 +596,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
 <div class="entry"><div class="sig"><b>render.gradient_glow</b>( <i>x, y, w, r, g, b, a, r2, g2, b2, a2, spread</i> )</div><div class="desc">Glow with a colour at each end.</div></div>
 <div class="entry"><div class="sig"><b>render.screen_size</b>( ) <em>&rarr; w, h</em></div><div class="desc">Screen size in pixels.</div></div>
 <div class="entry"><div class="sig"><b>render.world_to_screen</b>( <i>x, y, z</i> ) <em>&rarr; {x,y} | nil</em></div><div class="desc"><code>nil</code> when the point is off-screen.</div></div>
-<div class="entry"><div class="sig"><b>render.text</b>( <i>x, y, r, g, b, a, str</i> ) <em>&middot;</em> <b>render.measure_text</b>( <i>str</i> )</div><div class="desc">Uses the default menu font. For any other font see <a data-p='fonts' class='xref'>fonts</a>.</div></div>
+<div class="entry"><div class="sig"><b>render.text</b>( <i>x, y, r, g, b, a, str</i> ) <em>&middot;</em> <b>render.measure_text</b>( <i>str</i> )</div><div class="desc">Uses the default menu font. For any other font see <a href='#fonts' data-p='fonts' class='xref'>fonts</a>.</div></div>
 <div class="entry"><div class="sig"><b>render.box3d</b>( <i>x, y, z, pitch, yaw, roll, mins, maxs, r, g, b, a, duration</i> )</div><div class="desc">3D box that stays for <code>duration</code> seconds. Call it <strong>once</strong>, not every frame.</div></div>
 <div class="entry"><div class="sig"><b>render.capsule3d</b>( <i>ax, ay, az, bx, by, bz, radius, r, g, b, a, duration</i> )</div><div class="desc">Same, capsule between two points.</div></div>
 
@@ -634,7 +648,7 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
     <div class="intro"><p>Read and write networked properties by name.</p></div>
     <div class="entry"><div class="sig"><b>e:get_prop</b>( <i>name</i> )</div><div class="desc">Returns the value, or <code>nil</code> if that prop doesn&rsquo;t exist on this entity.</div></div>
 <div class="entry"><div class="sig"><b>e:set_prop</b>( <i>name</i>, <i>value</i> )<span class="pill warn">restricted</span></div><div class="desc">Returns <code>true</code> on success. Some props are blocked &mdash; see below.</div></div>
-<div class="entry"><div class="sig"><b>e:get_prop_address</b>( <i>name</i> ) <em>&middot;</em> <b>e:address</b>( )</div><div class="desc">Memory address, for use with <a data-p='ffi' class='xref'>ffi</a>.</div></div>
+<div class="entry"><div class="sig"><b>e:get_prop_address</b>( <i>name</i> ) <em>&middot;</em> <b>e:address</b>( )</div><div class="desc">Memory address, for use with <a href='#ffi' data-p='ffi' class='xref'>ffi</a>.</div></div>
 <div class="entry"><div class="sig"><b>entity.get_offset</b>( <i>table</i>, <i>prop</i> ) <em>&rarr; number | nil</em></div><div class="desc">Offset without needing an entity.</div></div>
 <div class="tw"><table><thead><tr><th>set_prop blocks</th><th>reason</th></tr></thead><tbody><tr><td>other players</td><td>The server overwrites it immediately, and it confuses the cheat&rsquo;s own tracking.</td></tr><tr><td>animation props</td><td>The cheat manages these itself.</td></tr><tr><td>predicted props</td><td>They get reset every prediction, so the write wouldn&rsquo;t stick.</td></tr></tbody></table></div><div class="note ">A blocked write prints the reason to console, so you&rsquo;ll know why nothing happened. Use ffi if you need to do it anyway.</div>
   </div>
@@ -646,7 +660,7 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <div class="entry"><div class="sig"><b>w:get_mode</b>( ) <em>&middot;</em> <b>w:is_shootable</b>( )</div><div class="desc">Scoped/burst mode, and whether it fires bullets.</div></div>
 <div class="entry"><div class="sig"><b>w:get_max_speed</b>( ) <em>&middot;</em> <b>w:get_cycletime</b>( )</div><div class="desc">Move speed with this weapon, and time between shots.</div></div>
 <div class="entry"><div class="sig"><b>w:get_inaccuracy</b>( ) <em>&middot;</em> <b>w:get_spread</b>( )</div><div class="desc">Current accuracy. Only for your own weapon &mdash; returns <code>nil</code> for anyone else&rsquo;s.</div></div>
-<div class="entry"><div class="sig"><b>w:get_wpn_data</b>( ) <em>&rarr; table</em></div><div class="desc">All the weapon&rsquo;s stats. See <a data-p='wpndata' class='xref'>weapon data</a>.</div></div>
+<div class="entry"><div class="sig"><b>w:get_wpn_data</b>( ) <em>&rarr; table</em></div><div class="desc">All the weapon&rsquo;s stats. See <a href='#wpndata' data-p='wpndata' class='xref'>weapon data</a>.</div></div>
 
   </div>
 
