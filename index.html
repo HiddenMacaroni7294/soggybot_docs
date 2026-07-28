@@ -1,0 +1,587 @@
+<title>soggybot lua api</title>
+
+<style>
+:root{
+  --bg:#F6F7FA; --panel:#FFFFFF; --panel-2:#EEF0F6; --line:#DCDFE9;
+  --ink:#15171F; --ink-2:#4A4F60; --ink-3:#767C90;
+  --accent:#B87400; --accent-ink:#FFB200;
+  --blue:#3F6FB5; --purple:#6C5FD0;
+  --ok:#4E8A0C; --bad:#C0342C;
+  --code-bg:#EDEFF5;
+  --shadow:0 1px 2px rgba(20,22,34,.06),0 8px 24px rgba(20,22,34,.05);
+  --mono:"Cascadia Code","Cascadia Mono",Consolas,"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace;
+  --sans:"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0E0F15; --panel:#15171F; --panel-2:#1B1E28; --line:#272B38;
+    --ink:#E8EAF2; --ink-2:#A6ACC0; --ink-3:#767C90;
+    --accent:#FFB200; --accent-ink:#FFB200;
+    --blue:#91BEFF; --purple:#A096FF;
+    --ok:#7BC215; --bad:#FF6B60;
+    --code-bg:#0B0C11;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E0F15; --panel:#15171F; --panel-2:#1B1E28; --line:#272B38;
+  --ink:#E8EAF2; --ink-2:#A6ACC0; --ink-3:#767C90;
+  --accent:#FFB200; --accent-ink:#FFB200;
+  --blue:#91BEFF; --purple:#A096FF;
+  --ok:#7BC215; --bad:#FF6B60;
+  --code-bg:#0B0C11;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.3);
+}
+:root[data-theme="light"]{
+  --bg:#F6F7FA; --panel:#FFFFFF; --panel-2:#EEF0F6; --line:#DCDFE9;
+  --ink:#15171F; --ink-2:#4A4F60; --ink-3:#767C90;
+  --accent:#B87400; --accent-ink:#FFB200;
+  --blue:#3F6FB5; --purple:#6C5FD0;
+  --ok:#4E8A0C; --bad:#C0342C;
+  --code-bg:#EDEFF5;
+  --shadow:0 1px 2px rgba(20,22,34,.06),0 8px 24px rgba(20,22,34,.05);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.edge{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;
+  background:linear-gradient(90deg,#FFB200 0%,#91BEFF 52%,#A096FF 100%)}
+
+.wrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:0;max-width:1220px;margin:0 auto}
+
+/* ---------- sidebar ---------- */
+.side{
+  position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;
+  padding:34px 20px 40px;border-right:1px solid var(--line);
+}
+.brand{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-.01em;margin:0 0 2px}
+.brand span{color:var(--accent)}
+.brand-sub{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.04em;margin:0 0 22px}
+
+.search{position:relative;margin-bottom:20px}
+.search input{
+  width:100%;padding:9px 11px 9px 30px;border-radius:7px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  font-family:var(--mono);font-size:12.5px;
+}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+.search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;stroke:var(--ink-3);fill:none;stroke-width:2}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:6px}
+
+nav a{
+  display:block;padding:5px 9px;border-radius:6px;text-decoration:none;
+  color:var(--ink-2);font-size:13.5px;border-left:2px solid transparent;
+}
+nav a:hover{background:var(--panel-2);color:var(--ink)}
+nav a.on{color:var(--ink);border-left-color:var(--accent);background:var(--panel-2);font-weight:600}
+nav a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+nav .grp{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);margin:20px 0 6px 9px}
+
+/* ---------- main ---------- */
+main{padding:34px 40px 120px;min-width:0}
+.lede{max-width:64ch;margin:0 0 34px}
+h1{font-family:var(--mono);font-size:31px;font-weight:700;letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance}
+.lede p{color:var(--ink-2);margin:0 0 10px}
+
+section{scroll-margin-top:24px;margin-bottom:46px}
+h2{
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 4px;padding-bottom:9px;border-bottom:1px solid var(--line);
+}
+h2 .n{color:var(--ink-3);font-weight:400;margin-left:8px;letter-spacing:.05em;text-transform:none}
+.sec-note{color:var(--ink-2);max-width:64ch;margin:14px 0 18px}
+
+/* entry rows */
+.entry{
+  padding:13px 0;border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:minmax(0,1fr);gap:5px;
+}
+.entry:last-child{border-bottom:0}
+.sig{font-family:var(--mono);font-size:13px;color:var(--ink);overflow-x:auto;white-space:pre;padding-bottom:2px}
+.sig b{font-weight:700;color:var(--accent)}
+.sig i{font-style:normal;color:var(--blue)}
+.sig em{font-style:normal;color:var(--ink-3)}
+.desc{color:var(--ink-2);font-size:14px;max-width:70ch}
+.desc code,p code,li code,td code{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);
+  padding:1px 5px;border-radius:4px;color:var(--ink)}
+
+pre{
+  font-family:var(--mono);font-size:12.5px;line-height:1.62;background:var(--code-bg);
+  border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;margin:0 0 18px;
+}
+pre .c{color:var(--ink-3)}
+pre .k{color:var(--purple)}
+pre .s{color:var(--ok)}
+pre .f{color:var(--accent)}
+
+table{border-collapse:collapse;width:100%;margin:0 0 18px;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+tbody tr:last-child td{border-bottom:0}
+.tw{overflow-x:auto}
+
+.note{
+  border-left:3px solid var(--blue);background:var(--panel);border-radius:0 8px 8px 0;
+  padding:12px 16px;margin:0 0 18px;color:var(--ink-2);font-size:14px;box-shadow:var(--shadow)
+}
+.note.warn{border-left-color:var(--accent)}
+.note.bad{border-left-color:var(--bad)}
+.note strong{color:var(--ink)}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;padding:2px 7px;border-radius:20px;border:1px solid var(--line);
+  color:var(--ink-3);vertical-align:2px;margin-left:7px}
+.pill.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+.pill.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)}
+.pill.warn{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+
+mark{background:color-mix(in srgb,var(--accent-ink) 32%,transparent);color:inherit;border-radius:2px}
+.empty{display:none;color:var(--ink-3);font-family:var(--mono);font-size:13px;padding:20px 0}
+body.filtering section.hide,body.filtering .entry.hide{display:none}
+body.filtering .sec-note,body.filtering pre,body.filtering .note,body.filtering .tw{display:none}
+body.filtering .empty.show{display:block}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr}
+  .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:26px 22px}
+  main{padding:26px 22px 80px}
+  nav{columns:2}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="edge"></div>
+
+<div class="wrap">
+<aside class="side">
+  <p class="brand">soggybot<span>.lua</span></p>
+  <p class="brand-sub">LuaJIT 2.1 · sol2</p>
+
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="filter api…" autocomplete="off" aria-label="Filter the API">
+    <p class="hint" id="hint">press / to focus</p>
+  </div>
+
+  <nav id="nav">
+    <p class="grp">start</p>
+    <a href="#overview">overview</a>
+    <a href="#callbacks">callbacks</a>
+    <a href="#events">events</a>
+    <a href="#cmd">the cmd object</a>
+    <p class="grp">building</p>
+    <a href="#ui">ui</a>
+    <a href="#subtabs">subtabs</a>
+    <a href="#render">render</a>
+    <a href="#fonts">fonts</a>
+    <p class="grp">game state</p>
+    <a href="#entity">entity</a>
+    <a href="#props">props</a>
+    <a href="#weapon">weapon</a>
+    <a href="#wpndata">weapon data</a>
+    <p class="grp">misc</p>
+    <a href="#globals">globals</a>
+    <a href="#client">client</a>
+    <a href="#buttons">buttons</a>
+    <a href="#ffi">ffi</a>
+    <a href="#gotchas">gotchas</a>
+  </nav>
+</aside>
+
+<main>
+  <div class="lede">
+    <h1>lua api</h1>
+    <p>Scripts live in <code>Documents\&lt;user&gt;\scripts\*.lua</code> and load from the <strong>scripts</strong> tab.</p>
+    <p>Each script gets its own Lua state, so scripts cannot see or corrupt each other's globals. Every call into script code is protected — a script that raises is logged and <strong>unloaded</strong>, because a handler that throws once on a per-frame path throws every frame.</p>
+  </div>
+
+  <p class="empty" id="empty">no matches.</p>
+
+  <!-- ============ callbacks ============ -->
+  <section id="callbacks">
+    <h2>callbacks</h2>
+    <pre><span class="c">-- register a handler</span>
+<span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( ) <span class="c">…</span> <span class="k">end</span> )
+
+<span class="c">-- drops ALL handlers this script added for that event</span>
+<span class="f">callbacks.remove</span>( <span class="s">"paint"</span> )</pre>
+    <div class="entry"><div class="sig"><b>callbacks.add</b>( <i>event</i>, <i>fn</i> )</div>
+      <div class="desc">Register a handler. Multiple handlers per event are fine.</div></div>
+    <div class="entry"><div class="sig"><b>callbacks.remove</b>( <i>event</i> )</div>
+      <div class="desc">Remove every handler this script registered for <code>event</code>.</div></div>
+  </section>
+
+  <!-- ============ events ============ -->
+  <section id="events">
+    <h2>events <span class="n">— and when each is valid</span></h2>
+    <div class="tw"><table>
+      <thead><tr><th>event</th><th>arg</th><th>fires</th></tr></thead>
+      <tbody>
+        <tr><td><code>paint</code></td><td>—</td><td>Once per rendered frame, above the game, below the menu.</td></tr>
+        <tr><td><code>pre_move</code></td><td><code>cmd</code></td><td>Top of the tick, <strong>before</strong> the strafer.</td></tr>
+        <tr><td><code>in_move</code></td><td><code>cmd</code></td><td>After prediction, <strong>before</strong> the aimbot.</td></tr>
+        <tr><td><code>post_move</code></td><td><code>cmd</code></td><td>After the movement fix and final re-prediction.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note"><strong>Why the three move events sit where they do</strong> — it changes what your edits actually do.
+      <br><br><code>pre_move</code> runs before <code>StartMove</code> snapshots the cmd, and the strafer reads <em>those snapshots</em> rather than the live cmd. Input edits must happen here to be seen by it. <code>send_packet</code> is <strong>not yet meaningful</strong>.
+      <br><br><code>in_move</code> is the only point where <code>weapon:get_inaccuracy()</code> describes the shot about to be taken. <strong>Skipped while the doubletap key is held</strong>, same as the aimbot.
+      <br><br><code>post_move</code> is the last point cmd can be edited coherently. Inaccuracy read here reflects <strong>post-fire penalty state</strong> — next tick's starting value, not what the shot used.
+    </div>
+  </section>
+
+  <!-- ============ cmd ============ -->
+  <section id="cmd">
+    <h2>the cmd object <span class="n">— accessors, not properties</span></h2>
+    <div class="entry"><div class="sig"><b>cmd:get_yaw</b>( ) <em>·</em> <b>cmd:set_yaw</b>( <i>v</i> )</div>
+      <div class="desc">Also <code>get_pitch</code>/<code>set_pitch</code> and <code>get_roll</code>/<code>set_roll</code>.</div></div>
+    <div class="entry"><div class="sig"><b>cmd:get_forwardmove</b>( ) <em>·</em> <b>cmd:set_forwardmove</b>( <i>v</i> )</div>
+      <div class="desc">Also <code>sidemove</code> and <code>upmove</code>.</div></div>
+    <div class="entry"><div class="sig"><b>cmd:get_weaponselect</b>( ) <em>·</em> <b>cmd:set_weaponselect</b>( <i>v</i> )</div><div class="desc">Weapon switch slot.</div></div>
+    <div class="entry"><div class="sig"><b>cmd:get_send_packet</b>( ) <em>·</em> <b>cmd:set_send_packet</b>( <i>bool</i> )</div>
+      <div class="desc">Fakelag choke. Not meaningful in <code>pre_move</code>; finalized by <code>post_move</code>.</div></div>
+    <div class="entry"><div class="sig"><b>cmd:add_button</b>( <i>bit</i> ) <span class="pill warn">gated</span></div>
+      <div class="desc">Returns <code>false</code> if the attack bit was refused.</div></div>
+    <div class="entry"><div class="sig"><b>cmd:strip_button</b>( <i>bit</i> ) <span class="pill warn">gated</span></div>
+      <div class="desc">Returns <code>false</code> if the attack bit was refused. Other bits in the same mask still strip.</div></div>
+    <div class="entry"><div class="sig"><b>cmd:has_button</b>( <i>bit</i> )</div><div class="desc">Test a button bit.</div></div>
+    <div class="entry"><div class="sig"><b>cmd:get_buttons</b>( ) <span class="pill">read only</span></div>
+      <div class="desc">No setter — a raw write would sidestep the attack policy below.</div></div>
+    <div class="entry"><div class="sig"><b>cmd:get_command_number</b>( ) <em>·</em> <b>cmd:get_tick</b>( ) <em>·</em> <b>cmd:get_random_seed</b>( ) <span class="pill">read only</span></div>
+      <div class="desc">Writing any of these desyncs prediction or the engine's command change-tracking.</div></div>
+
+    <div class="note warn"><strong>IN_ATTACK belongs to soggybot.</strong> By the time a script sees the cmd, the aimbot has already resolved hitchance, safety and autostop.
+      <br><br><span class="pill bad">refused</span> stripping it, outright.
+      <br><span class="pill ok">allowed</span> adding it, but only when <code>client.can_fire()</code> is true.
+      <br><br>Both calls return a boolean rather than logging, because this runs 64×/s.
+    </div>
+    <div class="note bad"><strong>cmd is valid only inside the callback that gave it to you.</strong> Stashing it and touching it next frame raises a clean Lua error instead of writing into a dead stack frame.</div>
+  </section>
+
+  <!-- ============ ui ============ -->
+  <section id="ui">
+    <h2>ui</h2>
+    <p class="sec-note">Creators take <code>(tab, column, name, …)</code> and return a <strong>handle</strong>. <code>column</code> is <code>0</code> or <code>1</code> — soggybot has two columns per tab rather than named containers.</p>
+    <pre><span class="k">local</span> a = <span class="f">ui.checkbox</span>    ( <span class="s">"scripts"</span>, 1, <span class="s">"enabled"</span>, <span class="k">true</span> )
+<span class="k">local</span> b = <span class="f">ui.slider</span>      ( <span class="s">"scripts"</span>, 1, <span class="s">"amount"</span>, 0, 100, 50 )
+<span class="k">local</span> c = <span class="f">ui.combobox</span>    ( <span class="s">"scripts"</span>, 1, <span class="s">"mode"</span>, <span class="s">"one"</span>, <span class="s">"two"</span> )
+<span class="k">local</span> d = <span class="f">ui.color_picker</span>( <span class="s">"scripts"</span>, 1, <span class="s">"colour"</span>, 255, 178, 0, 255 )
+<span class="f">ui.button</span>( <span class="s">"scripts"</span>, 1, <span class="s">"do it"</span>, <span class="k">function</span>( ) <span class="c">…</span> <span class="k">end</span> )</pre>
+    <div class="entry"><div class="sig"><b>ui.checkbox</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <em>[default]</em> )</div><div class="desc">Boolean toggle.</div></div>
+    <div class="entry"><div class="sig"><b>ui.slider</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>min</i>, <i>max</i>, <em>[default]</em> )</div><div class="desc">Numeric range.</div></div>
+    <div class="entry"><div class="sig"><b>ui.combobox</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>…items</i> )</div><div class="desc">Single-choice dropdown. <code>ui.get</code> returns the index.</div></div>
+    <div class="entry"><div class="sig"><b>ui.multiselect</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>…items</i> )</div><div class="desc">Multi-choice. <code>ui.get</code> returns an array of selected indices.</div></div>
+    <div class="entry"><div class="sig"><b>ui.hotkey</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc"><code>ui.get</code> returns the live on/off state, not the key code.</div></div>
+    <div class="entry"><div class="sig"><b>ui.color_picker</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <em>[r]</em>, <em>[g]</em>, <em>[b]</em>, <em>[a]</em> )</div><div class="desc"><code>ui.get</code> returns <code>{r,g,b,a}</code>.</div></div>
+    <div class="entry"><div class="sig"><b>ui.button</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>fn</i> )</div><div class="desc">Runs <code>fn</code> on click.</div></div>
+    <div class="entry"><div class="sig"><b>ui.intbox</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc">Numeric text field. Not a string box — the stored text must stay parseable.</div></div>
+    <div class="entry"><div class="sig"><b>ui.get</b>( <i>handle</i> ) <em>·</em> <b>ui.set</b>( <i>handle</i>, <i>value</i> )</div><div class="desc">Typed by what the control actually holds.</div></div>
+    <div class="entry"><div class="sig"><b>ui.name</b>( <i>handle</i> ) <em>·</em> <b>ui.set_visible</b>( <i>handle</i>, <i>bool</i> )</div><div class="desc">Visibility is re-read every frame.</div></div>
+    <div class="entry"><div class="sig"><b>ui.set_callback</b>( <i>handle</i>, <i>fn</i> )</div>
+      <div class="desc">Fires on change. <strong>One slot</strong> — registering twice replaces the first.</div></div>
+    <div class="note"><strong>Values persist to config automatically.</strong> A config loaded <em>before</em> your script runs is replayed onto your controls when they appear, so load order doesn't matter.</div>
+  </section>
+
+  <!-- ============ subtabs ============ -->
+  <section id="subtabs">
+    <h2>subtabs <span class="n">— and script isolation</span></h2>
+    <pre><span class="k">local</span> page = <span class="f">ui.subtab</span>( <span class="s">"scripts"</span>, <span class="s">"my script"</span>, <span class="s">"LEFT"</span>, <span class="s">"RIGHT"</span> )
+<span class="f">ui.set_subtab</span>( handle, page )</pre>
+    <div class="entry"><div class="sig"><b>ui.subtab</b>( <i>tab</i>, <i>name</i>, <em>[left_title]</em>, <em>[right_title]</em> )</div>
+      <div class="desc">Claims a page and returns its index. Titles are optional — left defaults to the page name in caps, right to <code>"OPTIONS"</code>.</div></div>
+    <div class="entry"><div class="sig"><b>ui.set_subtab</b>( <i>handle</i>, <i>page</i> )</div>
+      <div class="desc">Moves a control onto that page. Works before or after the control appears.</div></div>
+    <div class="tw"><table>
+      <thead><tr><th></th><th>where your controls live</th></tr></thead>
+      <tbody>
+        <tr><td><strong>claimed a subtab</strong></td><td>Their own page, <strong>both columns</strong>, own column titles.</td></tr>
+        <tr><td><strong>didn't</strong></td><td>Shared manager page, column 1 only, visible <strong>only while your script is selected in the listbox</strong> — so two scripts never stack.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ============ render ============ -->
+  <section id="render">
+    <h2>render</h2>
+    <p class="sec-note">Every 2D call is a <strong>no-op outside <code>paint</code></strong> — the draw batch only exists between the engine's frame begin and publish.</p>
+    <div class="entry"><div class="sig"><b>render.rect</b>( <i>x, y, w, h, r, g, b, a</i> ) <em>·</em> <b>render.rect_filled</b>( … )</div><div class="desc">Outline and fill.</div></div>
+    <div class="entry"><div class="sig"><b>render.rect_rounded</b>( <i>x, y, w, h, radius, r, g, b, a</i>, <em>[segs]</em> )</div><div class="desc">Also <code>rect_filled_rounded</code>. <code>segs</code> defaults to 8.</div></div>
+    <div class="entry"><div class="sig"><b>render.rect_outlined</b>( <i>x, y, w, h, r, g, b, a, r2, g2, b2, a2</i> )</div><div class="desc">Two-colour outline.</div></div>
+    <div class="entry"><div class="sig"><b>render.rect_filled_fade</b>( <i>x, y, w, h, r, g, b, a, a1, a2</i> )</div><div class="desc">Fill fading between two alphas.</div></div>
+    <div class="entry"><div class="sig"><b>render.rect_filled_4</b>( <i>x, y, w, h, tl, tr, br, bl</i> )</div><div class="desc">Independent colour per corner — each a <code>{r,g,b,a}</code> table.</div></div>
+    <div class="entry"><div class="sig"><b>render.gradient</b>( … ) <em>·</em> <b>render.gradient_v</b>( … )</div><div class="desc">Horizontal and vertical two-colour fills.</div></div>
+    <div class="entry"><div class="sig"><b>render.line</b>( <i>x0, y0, x1, y1, r, g, b, a</i> )</div><div class="desc">Single line.</div></div>
+    <div class="entry"><div class="sig"><b>render.circle</b>( <i>x, y, radius, segments, r, g, b, a</i> )</div><div class="desc">Filled circle.</div></div>
+    <div class="entry"><div class="sig"><b>render.arc</b>( <i>x, y, r_inner, r_outer, start_rad, sweep_rad, segs, r, g, b, a</i> )</div><div class="desc">Filled ring slice. What radial countdowns are built from.</div></div>
+    <div class="entry"><div class="sig"><b>render.triangle</b>( <i>x0, y0, x1, y1, x2, y2, r, g, b, a</i>, <em>[arrow]</em> )</div><div class="desc">Filled triangle.</div></div>
+    <div class="entry"><div class="sig"><b>render.rect_glow</b>( <i>x, y, w, h, r, g, b, a, spread</i>, <em>[segs]</em>, <em>[radius]</em> )</div>
+      <div class="desc">Additive halo — draw the crisp shape on top of it.</div></div>
+    <div class="entry"><div class="sig"><b>render.gradient_glow</b>( <i>x, y, w, r, g, b, a, r2, g2, b2, a2, spread</i> )</div><div class="desc">Additive halo with a per-end colour.</div></div>
+    <div class="entry"><div class="sig"><b>render.screen_size</b>( ) <em>→ w, h</em></div><div class="desc">Current backbuffer size.</div></div>
+    <div class="entry"><div class="sig"><b>render.world_to_screen</b>( <i>x, y, z</i> ) <em>→ {x,y} | nil</em></div><div class="desc"><code>nil</code> when off-screen.</div></div>
+    <div class="entry"><div class="sig"><b>render.text</b>( <i>x, y, r, g, b, a, str</i> ) <em>·</em> <b>render.measure_text</b>( <i>str</i> )</div>
+      <div class="desc">Shortcuts over the default menu font. For anything else make a font object.</div></div>
+
+    <div class="note warn"><strong>3D overlays behave differently.</strong> <code>render.box3d</code> and <code>render.capsule3d</code> are <em>queued with a duration</em> and flushed by the overlay pass, so unlike everything above they are legal <em>outside</em> paint. <strong>Push once, not every frame</strong> — <code>duration &lt;= 0</code> means this frame only.</div>
+    <div class="entry"><div class="sig"><b>render.box3d</b>( <i>x, y, z, pitch, yaw, roll, mins, maxs, r, g, b, a, duration</i> )</div><div class="desc"><code>mins</code>/<code>maxs</code> are <code>{x,y,z}</code> tables.</div></div>
+    <div class="entry"><div class="sig"><b>render.capsule3d</b>( <i>ax, ay, az, bx, by, bz, radius, r, g, b, a, duration</i> )</div><div class="desc">Capsule between two points.</div></div>
+  </section>
+
+  <!-- ============ fonts ============ -->
+  <section id="fonts">
+    <h2>fonts</h2>
+    <pre><span class="k">local</span> f = <span class="f">render.create_font</span>( <span class="s">"Verdana"</span>, 14, 500,
+    bit.bor( font_flags.antialias, font_flags.outline ),
+    0,                    <span class="c">-- width, 0 = auto</span>
+    font_aa.cleartype )
+
+<span class="k">local</span> w, h = f:<span class="f">get_size</span>( <span class="s">"hello"</span> )
+f:<span class="f">text</span>( x, y, 255, 178, 0, 255, <span class="s">"hello"</span> )</pre>
+    <div class="entry"><div class="sig"><b>render.create_font</b>( <i>name</i>, <i>size</i>, <em>[weight]</em>, <em>[flags]</em>, <em>[width]</em>, <em>[aa]</em> )</div>
+      <div class="desc">Owned by your script; released on unload.</div></div>
+    <div class="entry"><div class="sig"><b>font:get_size</b>( <i>str</i> ) <em>→ w, h</em></div><div class="desc">Measure in this face.</div></div>
+    <div class="entry"><div class="sig"><b>font:text</b>( <i>x, y, r, g, b, a, str</i> ) <em>·</em> <b>font:text_centered</b>( … )</div><div class="desc">Draw, left-aligned or centred.</div></div>
+    <div class="entry"><div class="sig"><b>font:text_glow</b>( <i>x, y, r, g, b, a, gr, gg, gb, ga, str</i> )</div><div class="desc">Text with a coloured halo behind it.</div></div>
+    <div class="entry"><div class="sig"><b>render.fonts.menu</b> <em>·</em> <b>menu_bold</b> <em>·</em> <b>menu_tab</b></div>
+      <div class="desc">The menu's own faces, so you can match the UI without building anything.</div></div>
+    <div class="note"><strong>font_flags</strong> — <code>none</code>, <code>antialias</code>, <code>dropshadow</code>, <code>outline</code>. <strong>font_aa</strong> — <code>default</code>, <code>none</code>, <code>standard</code>, <code>cleartype</code>.
+      <br><br>These are independent on purpose. <code>font_aa</code> threads straight to <code>CreateFont</code>'s quality argument; <code>font_flags.antialias</code> only <em>derives</em> it when <code>font_aa</code> is <code>default</code>. Raster faces need <code>font_aa.none</code> explicitly or they turn to mush.
+      <br><br>Dropshadow and outline are baked into the atlas at creation, so they live on the font, not the draw call.
+    </div>
+  </section>
+
+  <!-- ============ entity ============ -->
+  <section id="entity">
+    <h2>entity</h2>
+    <div class="entry"><div class="sig"><b>entity.get_local_player</b>( ) <em>→ entity | nil</em></div><div class="desc">Resolved fresh each call.</div></div>
+    <div class="entry"><div class="sig"><b>entity.get</b>( <i>index</i> ) <em>→ entity | nil</em></div><div class="desc">By entity index.</div></div>
+    <div class="entry"><div class="sig"><b>entity.get_players</b>( <em>[enemies_only]</em> ) <em>→ array</em></div><div class="desc">Alive players, optionally enemies only.</div></div>
+    <div class="entry"><div class="sig"><b>entity.get_offset</b>( <i>"DT_BasePlayer"</i>, <i>"m_vecOrigin"</i> ) <em>→ number | nil</em></div>
+      <div class="desc">Netvar offset with no entity in hand — for building ffi structs.</div></div>
+    <div class="entry"><div class="sig"><b>e:valid</b>( ) <em>·</em> <b>e:index</b>( ) <em>·</em> <b>e:is_player</b>( ) <em>·</em> <b>e:is_dormant</b>( )</div><div class="desc">Identity and state.</div></div>
+    <div class="entry"><div class="sig"><b>e:is_alive</b>( ) <em>·</em> <b>e:is_enemy</b>( ) <em>·</em> <b>e:get_team</b>( ) <em>·</em> <b>e:get_health</b>( )</div><div class="desc">Player state.</div></div>
+    <div class="entry"><div class="sig"><b>e:get_origin</b>( ) <em>→ {x,y,z}</em></div><div class="desc">World position.</div></div>
+    <div class="entry"><div class="sig"><b>e:get_weapon</b>( ) <em>→ weapon | nil</em></div><div class="desc">Active weapon.</div></div>
+    <div class="note"><strong>Entities are handles that re-resolve on every call</strong>, never stored pointers. A freed entity returns <code>nil</code> instead of crashing.</div>
+  </section>
+
+  <!-- ============ props ============ -->
+  <section id="props">
+    <h2>props <span class="n">— and the set_prop gate</span></h2>
+    <div class="entry"><div class="sig"><b>e:get_prop</b>( <i>name</i> ) <span class="pill ok">always allowed</span></div>
+      <div class="desc">Typed by the RecvProp; <code>nil</code> if unknown. Resolved by name against the entity's <strong>own</strong> recv table, so it is exact and never force-flattens every class.</div></div>
+    <div class="entry"><div class="sig"><b>e:set_prop</b>( <i>name</i>, <i>value</i> ) <span class="pill warn">gated</span></div>
+      <div class="desc">Returns <code>true</code>/<code>false</code> and refuses loudly, with the reason in console.</div></div>
+    <div class="entry"><div class="sig"><b>e:get_prop_address</b>( <i>name</i> ) <em>·</em> <b>e:address</b>( )</div>
+      <div class="desc">Raw address, for ffi. Inert without ffi, so it needs no gate of its own.</div></div>
+    <div class="tw"><table>
+      <thead><tr><th>refused</th><th>why</th></tr></thead>
+      <tbody>
+        <tr><td>non-local entities</td><td>Overwritten by the next server update anyway; only corrupts your own lagcomp and resolver state in between.</td></tr>
+        <tr><td>animation fields</td><td>soggybot's anim pipeline assumes it is the only writer.</td></tr>
+        <tr><td>predicted fields</td><td>Restored every re-prediction — the write is silently reverted, or corrupts the baseline.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><strong>Predicted fields are detected, not listed.</strong> The gate reads the entity's own prediction datamap, so it cannot rot as the game changes. If you genuinely mean it, use <code>get_prop_address</code> + ffi.</div>
+  </section>
+
+  <!-- ============ weapon ============ -->
+  <section id="weapon">
+    <h2>weapon</h2>
+    <div class="entry"><div class="sig"><b>w:get_item_index</b>( ) <em>·</em> <b>w:get_ammo</b>( ) <em>·</em> <b>w:get_next_attack</b>( )</div><div class="desc">Definition index, clip, next-attack time.</div></div>
+    <div class="entry"><div class="sig"><b>w:get_mode</b>( ) <em>·</em> <b>w:is_shootable</b>( ) <em>·</em> <b>w:get_max_speed</b>( )</div>
+      <div class="desc">Mode selects between primary and <code>_alt</code> values. Max speed follows it.</div></div>
+    <div class="entry"><div class="sig"><b>w:get_cycletime</b>( )</div><div class="desc">Time between shots for the current mode.</div></div>
+    <div class="entry"><div class="sig"><b>w:get_inaccuracy</b>( ) <em>·</em> <b>w:get_spread</b>( ) <span class="pill warn">in_move only</span></div>
+      <div class="desc">Returns <strong>nil</strong> for anything that is not the local player's active shootable weapon. These are predicted globals describing that weapon only — a number for anyone else's would be a confident lie.</div></div>
+  </section>
+
+  <!-- ============ wpndata ============ -->
+  <section id="wpndata">
+    <h2>weapon data <span class="n">— w:get_wpn_data()</span></h2>
+    <p class="sec-note">The whole <code>WeaponInfo</code> as a table. <strong>Static per weapon definition</strong>, so it carries none of the freshness caveats above — but it builds a fresh table each call, so hoist it out of hot loops. Returns <code>nil</code> for a tick around skin-changer definition swaps.</p>
+    <div class="tw"><table>
+      <thead><tr><th>group</th><th>fields</th></tr></thead>
+      <tbody>
+        <tr><td>rates</td><td><code>cycletime</code>, <code>cycletime_alt</code>, <code>time_to_idle</code></td></tr>
+        <tr><td>inaccuracy</td><td><code>inaccuracy_stand</code>, <code>_crouch</code>, <code>_move</code>, <code>_jump</code>, <code>_jump_initial</code>, <code>_land</code>, <code>_ladder</code>, <code>_fire</code>, <code>_reload</code> — each with an <code>_alt</code></td></tr>
+        <tr><td>recovery</td><td><code>recovery_time_stand</code>, <code>_crouch</code>, their <code>_final</code>, <code>recovery_transition_start_bullet</code>, <code>_end_bullet</code></td></tr>
+        <tr><td>recoil</td><td><code>recoil_angle</code>, <code>recoil_magnitude</code>, both variances, all with <code>_alt</code>, plus <code>recoil_seed</code></td></tr>
+        <tr><td>damage</td><td><code>damage</code>, <code>armor_ratio</code>, <code>bullets</code>, <code>penetration</code>, <code>range</code>, <code>range_modifier</code></td></tr>
+        <tr><td>misc</td><td><code>name</code>, <code>type</code>, <code>price</code>, <code>full_auto</code>, <code>has_silencer</code>, <code>max_clip</code>, <code>max_reserve</code>, <code>spread</code>, <code>spread_alt</code>, <code>max_player_speed</code>, <code>max_player_speed_alt</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="note warn"><strong>cycletime is not recovery time.</strong> <code>cycletime</code> is time between shots — fire rate. <code>recovery_time_*</code> is how fast inaccuracy decays back down after firing. "Recovers after one shot" is the second one.</div>
+  </section>
+
+  <!-- ============ globals ============ -->
+  <section id="globals">
+    <h2>globals</h2>
+    <div class="entry"><div class="sig"><b>globals.curtime</b>( ) <em>·</em> <b>realtime</b>( ) <em>·</em> <b>frametime</b>( ) <em>·</em> <b>absoluteframetime</b>( )</div><div class="desc">Clocks, in seconds.</div></div>
+    <div class="entry"><div class="sig"><b>globals.tickcount</b>( ) <em>·</em> <b>tickinterval</b>( ) <em>·</em> <b>framecount</b>( ) <em>·</em> <b>maxplayers</b>( )</div><div class="desc">Tick and frame counters.</div></div>
+  </section>
+
+  <!-- ============ client ============ -->
+  <section id="client">
+    <h2>client</h2>
+    <div class="entry"><div class="sig"><b>client.log</b>( <i>…</i> ) <em>·</em> <b>print</b>( <i>…</i> )</div><div class="desc">Console line with a <code>[lua]</code> tag. Handles any value type.</div></div>
+    <div class="entry"><div class="sig"><b>client.color_log</b>( <i>r, g, b, …</i> )</div><div class="desc">Same, coloured.</div></div>
+    <div class="entry"><div class="sig"><b>client.key_state</b>( <i>vk</i> )</div><div class="desc">Virtual key held.</div></div>
+    <div class="entry"><div class="sig"><b>client.can_fire</b>( ) <span class="pill warn">in_move only</span></div>
+      <div class="desc">Whether this tick can produce a shot — the gate <code>cmd:add_button</code> applies to <code>IN_ATTACK</code>. Check before asking rather than after being refused.</div></div>
+  </section>
+
+  <!-- ============ buttons ============ -->
+  <section id="buttons">
+    <h2>buttons</h2>
+    <p class="sec-note">All 26 <code>IN_*</code> constants, named exactly as in the C++ source so anything you read in the codebase transfers directly.</p>
+    <pre>IN_ATTACK   IN_JUMP      IN_DUCK      IN_FORWARD   IN_BACK
+IN_USE      IN_CANCEL    IN_LEFT      IN_RIGHT     IN_MOVELEFT
+IN_MOVERIGHT IN_ATTACK2  IN_RUN       IN_RELOAD    IN_ALT1
+IN_ALT2     IN_SCORE     IN_SPEED     IN_WALK      IN_ZOOM
+IN_WEAPON1  IN_WEAPON2   IN_BULLRUSH  IN_GRENADE1  IN_GRENADE2
+IN_ATTACK3</pre>
+  </section>
+
+  <!-- ============ ffi ============ -->
+  <section id="ffi">
+    <h2>ffi</h2>
+    <p class="sec-note">Off by default. Enable <strong>allow unsafe scripts</strong> in the scripts tab.</p>
+    <pre><span class="k">local</span> ffi = require( <span class="s">"ffi"</span> )
+<span class="k">local</span> addr = me:<span class="f">get_prop_address</span>( <span class="s">"m_flFlashDuration"</span> )
+ffi.cast( <span class="s">"float*"</span>, addr )[ 0 ] = 0</pre>
+    <div class="note bad"><strong>FFI gives a script full access to the process</strong> — it can do anything the cheat can. Only enable it for scripts you wrote or trust. Once it is on, every safety gate in this document is advisory: a script can write the memory directly.</div>
+    <div class="note"><strong>You still never hardcode an offset.</strong> That is the point of <code>entity.get_offset</code> and <code>e:get_prop_address</code> — escaping the safe path shouldn't also mean giving up build independence, since hardcoded offsets are what actually rot on a game update.</div>
+  </section>
+
+  <!-- ============ gotchas ============ -->
+  <section id="gotchas">
+    <h2>gotchas</h2>
+    <div class="entry"><div class="sig"><b>validity windows</b></div>
+      <div class="desc"><code>get_inaccuracy</code>, <code>get_spread</code> and <code>get_mode</code> are predicted — only trustworthy from <code>in_move</code> onward, never from <code>paint</code>. <code>get_wpn_data</code> is static and always safe.</div></div>
+    <div class="entry"><div class="sig"><b>one callback slot per element</b></div>
+      <div class="desc"><code>ui.set_callback</code> called twice on the same handle replaces the first. Do the work in one function.</div></div>
+    <div class="entry"><div class="sig"><b>handles are never recycled</b></div>
+      <div class="desc">A handle whose element was destroyed resolves to <code>nil</code> forever after, so a stale reference is inert rather than dangerous.</div></div>
+    <div class="entry"><div class="sig"><b>errors unload the script</b></div>
+      <div class="desc">Deliberate — a broken handler on a per-frame path would otherwise spam at framerate. The unload is logged.</div></div>
+    <div class="entry"><div class="sig"><b>column 0 vs column 1</b></div>
+      <div class="desc">On the shared manager page, column 0 belongs to the script manager — use column 1. On your own subtab, both are yours.</div></div>
+  </section>
+</main>
+</div>
+
+<script>
+(function(){
+  var q = document.getElementById('q');
+  var empty = document.getElementById('empty');
+  var secs = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+
+  // remember original markup so highlighting is reversible
+  secs.forEach(function(s){
+    s.querySelectorAll('.sig,.desc,td,h2').forEach(function(n){ n.dataset.o = n.innerHTML; });
+  });
+
+  function clear(n){ if(n.dataset.o !== undefined) n.innerHTML = n.dataset.o; }
+  function esc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+  function mark(n, re){
+    clear(n);
+    if(!re) return;
+    var walk = document.createTreeWalker(n, NodeFilter.SHOW_TEXT, null);
+    var hits = [], t;
+    while((t = walk.nextNode())) if(re.test(t.nodeValue)) hits.push(t);
+    hits.forEach(function(node){
+      var frag = document.createDocumentFragment(), last = 0, s = node.nodeValue, m;
+      re.lastIndex = 0;
+      while((m = re.exec(s))){
+        frag.appendChild(document.createTextNode(s.slice(last, m.index)));
+        var el = document.createElement('mark');
+        el.textContent = m[0];
+        frag.appendChild(el);
+        last = m.index + m[0].length;
+        if(m[0].length === 0) re.lastIndex++;
+      }
+      frag.appendChild(document.createTextNode(s.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  function run(){
+    var term = q.value.trim();
+    if(!term){
+      document.body.classList.remove('filtering');
+      secs.forEach(function(s){
+        s.classList.remove('hide');
+        s.querySelectorAll('.entry').forEach(function(e){ e.classList.remove('hide'); });
+        s.querySelectorAll('.sig,.desc,td,h2').forEach(clear);
+      });
+      empty.classList.remove('show');
+      return;
+    }
+
+    document.body.classList.add('filtering');
+    var re = new RegExp(esc(term), 'gi');
+    var any = false;
+
+    secs.forEach(function(s){
+      var head = s.querySelector('h2');
+      var headHit = re.test(head.dataset.o.replace(/<[^>]+>/g,''));
+      re.lastIndex = 0;
+
+      var shown = 0;
+      s.querySelectorAll('.entry').forEach(function(e){
+        var text = e.textContent;
+        re.lastIndex = 0;
+        var hit = headHit || re.test(text);
+        e.classList.toggle('hide', !hit);
+        if(hit){
+          shown++;
+          e.querySelectorAll('.sig,.desc').forEach(function(n){ mark(n, re); });
+        } else {
+          e.querySelectorAll('.sig,.desc').forEach(clear);
+        }
+      });
+
+      // sections built from tables (events, wpndata) match on their whole text
+      var rows = s.querySelectorAll('td');
+      if(!s.querySelectorAll('.entry').length){
+        re.lastIndex = 0;
+        var tHit = headHit || re.test(s.textContent);
+        if(tHit){ shown = 1; rows.forEach(function(n){ mark(n, re); }); }
+        else rows.forEach(clear);
+      }
+
+      mark(head, headHit ? re : null);
+      s.classList.toggle('hide', shown === 0);
+      if(shown) any = true;
+    });
+
+    empty.classList.toggle('show', !any);
+  }
+
+  q.addEventListener('input', run);
+  q.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ q.value=''; run(); q.blur(); } });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
+  });
+
+  // scrollspy
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting) return;
+      var id = en.target.id;
+      links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === '#' + id); });
+    });
+  }, { rootMargin: '-10% 0px -75% 0px' });
+  secs.forEach(function(s){ obs.observe(s); });
+})();
+</script>
