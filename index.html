@@ -173,7 +173,7 @@ body.searching .page{display:none!important}
     <p class="grp">start</p>
     <a data-p="overview">overview</a>
     <a data-p="callbacks">callbacks</a>
-    <a data-p="events">events</a>
+    <a data-p="examples">examples</a>
 
     <p class="grp">menu</p>
     <a data-p="ui">ui</a>
@@ -229,35 +229,137 @@ body.searching .page{display:none!important}
     <p class="kicker">start</p>
     <h1>callbacks</h1>
     <div class="intro"><p>Hook an event and your function runs whenever it fires.</p></div>
-    <pre><span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( )
-    <span class="c">-- runs every frame</span>
-<span class="k">end</span> )</pre>
     <div class="entry"><div class="sig"><b>callbacks.add</b>( <i>event</i>, <i>fn</i> )</div>
       <div class="desc">Register a handler. You can add more than one per event.</div></div>
     <div class="entry"><div class="sig"><b>callbacks.remove</b>( <i>event</i> )</div>
       <div class="desc">Remove every handler your script added for that event.</div></div>
-  </div>
 
-  <!-- ===================== events ===================== -->
-  <div class="page" id="p-events">
-    <p class="kicker">start</p>
-    <h1>events</h1>
-    <div class="intro"><p>Four events for now. The three <code>*_move</code> ones fire once per tick and hand you a <a data-p="cmd" style="color:var(--accent)">cmd</a> object.</p></div>
+    <h2 style="font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:30px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)">events</h2>
     <div class="tw"><table>
       <thead><tr><th>event</th><th>arg</th><th>use it for</th></tr></thead>
       <tbody>
-        <tr><td><code>paint</code></td><td>—</td><td>Drawing. Fires every frame.</td></tr>
+        <tr><td><code>paint</code></td><td>&mdash;</td><td>Drawing. Fires every frame.</td></tr>
         <tr><td><code>pre_move</code></td><td><code>cmd</code></td><td>Changing input before the cheat runs.</td></tr>
-        <tr><td><code>in_move</code></td><td><code>cmd</code></td><td>Reading weapon and player state. Most values are current here.</td></tr>
+        <tr><td><code>in_move</code></td><td><code>cmd</code></td><td>Reading weapon and player state.</td></tr>
         <tr><td><code>post_move</code></td><td><code>cmd</code></td><td>Last chance to change the cmd.</td></tr>
       </tbody>
     </table></div>
-    <div class="note warn"><strong>Order matters for predicted values.</strong> Things like <code>get_inaccuracy</code>, <code>get_spread</code>, <code>get_mode</code> and <code>can_fire</code> are predicted, so <em>when</em> you read them changes what you get:
-      <br><br>· <code>pre_move</code> — one tick behind
-      <br>· <code>in_move</code> — current, and what the aimbot is about to act on
-      <br>· <code>post_move</code> — already updated for next tick
+
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">paint</p>
+    <pre><span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( )
+    <span class="k">local</span> <span class="v">w</span>, <span class="v">h</span> = <span class="f">render.screen_size</span>( )
+    <span class="f">render.text</span>( <span class="v">w</span> - <span class="n">120</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">"soggybot"</span> )
+<span class="k">end</span> )</pre>
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">pre_move</p>
+    <pre><span class="c">-- auto-crouch while in the air</span>
+<span class="f">callbacks.add</span>( <span class="s">"pre_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
+    <span class="k">if</span> <span class="v">cmd</span>:<span class="f">has_button</span>( <span class="v">buttons</span>.<span class="v">IN_JUMP</span> ) <span class="k">then</span>
+        <span class="v">cmd</span>:<span class="f">add_button</span>( <span class="v">buttons</span>.<span class="v">IN_DUCK</span> )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre>
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">in_move</p>
+    <pre><span class="c">-- stop moving when our accuracy is bad</span>
+<span class="f">callbacks.add</span>( <span class="s">"in_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
+    <span class="k">local</span> <span class="v">me</span> = <span class="f">entity.get_local_player</span>( )
+    <span class="k">local</span> <span class="v">w</span>  = <span class="v">me</span> <span class="k">and</span> <span class="v">me</span>:<span class="f">get_weapon</span>( )
+    <span class="k">if</span> <span class="k">not</span> <span class="v">w</span> <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> <span class="v">inacc</span> = <span class="v">w</span>:<span class="f">get_inaccuracy</span>( )
+    <span class="k">if</span> <span class="v">inacc</span> <span class="k">and</span> <span class="v">inacc</span> &gt; <span class="n">0.05</span> <span class="k">then</span>
+        <span class="v">cmd</span>:<span class="f">set_forwardmove</span>( <span class="n">0</span> )
+        <span class="v">cmd</span>:<span class="f">set_sidemove</span>( <span class="n">0</span> )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre>
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">post_move</p>
+    <pre><span class="c">-- count the ticks we actually sent</span>
+<span class="k">local</span> <span class="v">sent</span> = <span class="n">0</span>
+
+<span class="f">callbacks.add</span>( <span class="s">"post_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
+    <span class="k">if</span> <span class="v">cmd</span>:<span class="f">get_send_packet</span>( ) <span class="k">then</span>
+        <span class="v">sent</span> = <span class="v">sent</span> + <span class="n">1</span>
+    <span class="k">end</span>
+<span class="k">end</span> )</pre>
+
+    <div class="note warn"><strong>Order matters for predicted values.</strong> <code>get_inaccuracy</code>, <code>get_spread</code>, <code>get_mode</code> and <code>can_fire</code> are predicted, so <em>when</em> you read them changes what you get:
+      <br><br>&middot; <code>pre_move</code> &mdash; one tick behind
+      <br>&middot; <code>in_move</code> &mdash; current, and what the aimbot is about to act on
+      <br>&middot; <code>post_move</code> &mdash; already updated for next tick
       <br><br>Read them in <code>in_move</code> unless you specifically want otherwise.</div>
-    <div class="note"><code>in_move</code> doesn't fire while the doubletap key is held. <code>pre_move</code> and <code>post_move</code> still do.</div>
+    <div class="note"><code>in_move</code> does not fire while the doubletap key is held. <code>pre_move</code> and <code>post_move</code> still do.</div>
+  </div>
+
+  <!-- ===================== examples ===================== -->
+  <div class="page" id="p-examples">
+    <p class="kicker">start</p>
+    <h1>examples</h1>
+    <div class="intro"><p>Complete scripts. Save any of these as a <code>.lua</code> file and load it.</p></div>
+
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">watermark with a toggle</p>
+    <pre><span class="k">local</span> <span class="v">on</span>   = <span class="f">ui.checkbox</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"watermark"</span>, <span class="k">true</span> )
+<span class="k">local</span> <span class="v">col</span>  = <span class="f">ui.color_picker</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"colour"</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span> )
+<span class="k">local</span> <span class="v">font</span> = <span class="f">render.create_font</span>( <span class="s">"Verdana"</span>, <span class="n">14</span>, <span class="n">500</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( )
+    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( <span class="v">on</span> ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> <span class="v">c</span>    = <span class="f">ui.get</span>( <span class="v">col</span> )
+    <span class="k">local</span> <span class="v">text</span> = <span class="f">string.format</span>( <span class="s">"soggybot | %d fps"</span>,
+                    <span class="n">1</span> / <span class="f">math.max</span>( <span class="f">globals.frametime</span>( ), <span class="n">0.0001</span> ) )
+
+    <span class="k">local</span> <span class="v">tw</span>, <span class="v">th</span> = <span class="v">font</span>:<span class="f">get_size</span>( <span class="v">text</span> )
+    <span class="k">local</span> <span class="v">sw</span>     = <span class="f">render.screen_size</span>( )
+    <span class="k">local</span> <span class="v">x</span>, <span class="v">y</span>  = <span class="v">sw</span> - <span class="v">tw</span> - <span class="n">14</span>, <span class="n">10</span>
+
+    <span class="f">render.rect_filled</span>( <span class="v">x</span> - <span class="n">5</span>, <span class="v">y</span> - <span class="n">3</span>, <span class="v">tw</span> + <span class="n">10</span>, <span class="v">th</span> + <span class="n">6</span>, <span class="n">0</span>, <span class="n">0</span>, <span class="n">0</span>, <span class="n">150</span> )
+    <span class="v">font</span>:<span class="f">text</span>( <span class="v">x</span>, <span class="v">y</span>, <span class="v">c</span>[<span class="n">1</span>], <span class="v">c</span>[<span class="n">2</span>], <span class="v">c</span>[<span class="n">3</span>], <span class="v">c</span>[<span class="n">4</span>], <span class="v">text</span> )
+<span class="k">end</span> )</pre>
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">enemy health text</p>
+    <pre><span class="k">local</span> <span class="v">on</span> = <span class="f">ui.checkbox</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"health esp"</span>, <span class="k">true</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( )
+    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( <span class="v">on</span> ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">for</span> <span class="v">_</span>, <span class="v">p</span> <span class="k">in</span> <span class="f">ipairs</span>( <span class="f">entity.get_players</span>( <span class="k">true</span> ) ) <span class="k">do</span>
+        <span class="k">if</span> <span class="k">not</span> <span class="v">p</span>:<span class="f">is_dormant</span>( ) <span class="k">then</span>
+            <span class="k">local</span> <span class="v">o</span> = <span class="v">p</span>:<span class="f">get_origin</span>( )
+            <span class="k">local</span> <span class="v">s</span> = <span class="f">render.world_to_screen</span>( <span class="v">o</span>[<span class="n">1</span>], <span class="v">o</span>[<span class="n">2</span>], <span class="v">o</span>[<span class="n">3</span>] )
+
+            <span class="k">if</span> <span class="v">s</span> <span class="k">then</span>
+                <span class="k">local</span> <span class="v">hp</span> = <span class="v">p</span>:<span class="f">get_health</span>( )
+                <span class="f">render.text</span>( <span class="v">s</span>[<span class="n">1</span>], <span class="v">s</span>[<span class="n">2</span>],
+                    <span class="n">255</span> - <span class="v">hp</span> * <span class="n">2</span>, <span class="v">hp</span> * <span class="n">2</span>, <span class="n">40</span>, <span class="n">255</span>, <span class="f">tostring</span>( <span class="v">hp</span> ) )
+            <span class="k">end</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+<span class="k">end</span> )</pre>
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">its own subtab, with a hotkey</p>
+    <pre><span class="k">local</span> <span class="v">page</span>  = <span class="f">ui.subtab</span>( <span class="s">"scripts"</span>, <span class="s">"slowwalk"</span> )
+<span class="k">local</span> <span class="v">key</span>   = <span class="f">ui.hotkey</span>( <span class="s">"scripts"</span>, <span class="n">0</span>, <span class="s">"slowwalk key"</span> )
+<span class="k">local</span> <span class="v">speed</span> = <span class="f">ui.slider</span>( <span class="s">"scripts"</span>, <span class="n">0</span>, <span class="s">"speed"</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
+
+<span class="f">ui.set_subtab</span>( <span class="v">key</span>, <span class="v">page</span> )
+<span class="f">ui.set_subtab</span>( <span class="v">speed</span>, <span class="v">page</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">"pre_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
+    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( <span class="v">key</span> ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> <span class="v">want</span> = <span class="f">ui.get</span>( <span class="v">speed</span> )
+    <span class="k">local</span> <span class="v">f</span>, <span class="v">s</span> = <span class="v">cmd</span>:<span class="f">get_forwardmove</span>( ), <span class="v">cmd</span>:<span class="f">get_sidemove</span>( )
+    <span class="k">local</span> <span class="v">len</span>  = <span class="f">math.sqrt</span>( <span class="v">f</span> * <span class="v">f</span> + <span class="v">s</span> * <span class="v">s</span> )
+
+    <span class="k">if</span> <span class="v">len</span> &gt; <span class="v">want</span> <span class="k">then</span>
+        <span class="v">cmd</span>:<span class="f">set_forwardmove</span>( <span class="v">f</span> / <span class="v">len</span> * <span class="v">want</span> )
+        <span class="v">cmd</span>:<span class="f">set_sidemove</span>( <span class="v">s</span> / <span class="v">len</span> * <span class="v">want</span> )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre>
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">reacting to a menu change</p>
+    <pre><span class="k">local</span> <span class="v">mode</span>  = <span class="f">ui.combobox</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"mode"</span>, <span class="s">"off"</span>, <span class="s">"low"</span>, <span class="s">"high"</span> )
+<span class="k">local</span> <span class="v">power</span> = <span class="f">ui.slider</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"power"</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
+
+<span class="c">-- hide the slider unless a mode is picked</span>
+<span class="f">ui.set_callback</span>( <span class="v">mode</span>, <span class="k">function</span>( )
+    <span class="f">ui.set_visible</span>( <span class="v">power</span>, <span class="f">ui.get</span>( <span class="v">mode</span> ) ~= <span class="n">0</span> )
+<span class="k">end</span> )</pre>
   </div>
 
   <!-- ===================== ui ===================== -->
