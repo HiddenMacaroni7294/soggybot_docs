@@ -511,7 +511,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
     <div class="intro"><p>Handed to the <a href='#ev-aim' data-p='ev-aim' class='xref'>aimbot events</a>. Everything is captured when the shot is fired, so it still describes that shot when it resolves a moment later.</p></div>
     <div class="entry"><div class="sig"><b>shot:get_target</b>( ) <em>&rarr; entity | nil</em></div><div class="desc">Who we shot at.</div></div>
 <div class="entry"><div class="sig"><b>shot:get_hitbox</b>( ) <em>&middot;</em> <b>shot:get_hitgroup</b>( )</div><div class="desc">What we <strong>aimed at</strong>. Name them with <code>enums.hitbox</code> / <code>enums.hitgroup</code>.</div></div>
-<div class="entry"><div class="sig"><b>shot:get_hitchance</b>( ) <em>&middot;</em> <b>shot:get_point_hitchance</b>( )</div><div class="desc">The final hitchance, and the aimed point&rsquo;s own.</div></div>
+<div class="entry"><div class="sig"><b>shot:get_hitchance</b>( ) <em>&middot;</em> <b>shot:get_point_hitchance</b>( )</div><div class="desc">The final gate value, and the aimed point&rsquo;s own. <strong>The final one is <code>0</code> whenever hitchance is turned off in the menu</strong> &mdash; the cheat never computes it. <code>get_point_hitchance()</code> is the one you usually want.</div></div>
 <div class="entry"><div class="sig"><b>shot:get_aim_damage</b>( ) <em>&middot;</em> <b>shot:get_avg_damage</b>( )</div><div class="desc">Predicted damage, and the mean across the spread seeds that connected.</div></div>
 <div class="entry"><div class="sig"><b>shot:is_lethal</b>( ) <em>&middot;</em> <b>shot:is_penetrated</b>( ) <em>&middot;</em> <b>shot:get_overlap</b>( )</div><div class="desc">Whether the point would kill, went through a wall, and its safepoint score (<code>-1</code> = not scored).</div></div>
 <div class="entry"><div class="sig"><b>shot:get_hurt_group</b>( ) <em>&middot;</em> <b>shot:get_hurt_damage</b>( ) <em>&middot;</em> <b>shot:get_hurt_health</b>( )<span class="pill warn">aim_hit</span></div><div class="desc">What the <strong>server said</strong>. Only meaningful in <code>aim_hit</code>.</div></div>
@@ -613,7 +613,7 @@ speed:<span class="f">set_subtab</span>( page )</pre><div class="tw"><table><the
 <div class="entry"><div class="sig"><b>render.gradient_glow</b>( <i>x, y, w, r, g, b, a, r2, g2, b2, a2, spread</i> )</div><div class="desc">Glow with a colour at each end.</div></div>
 <div class="entry"><div class="sig"><b>render.screen_size</b>( ) <em>&rarr; w, h</em></div><div class="desc">Screen size in pixels.</div></div>
 <div class="entry"><div class="sig"><b>render.world_to_screen</b>( <i>x, y, z</i> ) <em>&rarr; {x,y} | nil</em></div><div class="desc"><code>nil</code> when the point is off-screen.</div></div>
-<div class="entry"><div class="sig"><b>render.text</b>( <i>x, y, r, g, b, a, str</i> ) <em>&middot;</em> <b>render.measure_text</b>( <i>str</i> )</div><div class="desc">Uses the default menu font. For any other font see <a href='#fonts' data-p='fonts' class='xref'>fonts</a>.</div></div>
+<div class="entry"><div class="sig"><b>render.text</b>( <i>x, y, r, g, b, a, str</i>, <em>[align]</em> ) <em>&middot;</em> <b>render.measure_text</b>( <i>str</i> )</div><div class="desc">Uses the default menu font. <code>align</code> is <code>enums.align.left</code> / <code>right</code> / <code>center</code>, defaulting to left. For any other font see <a href='#fonts' data-p='fonts' class='xref'>fonts</a>.</div></div>
 <div class="entry"><div class="sig"><b>render.box3d</b>( <i>x, y, z, pitch, yaw, roll, mins, maxs, r, g, b, a, duration</i> )</div><div class="desc">3D box that stays for <code>duration</code> seconds. Call it <strong>once</strong>, not every frame.</div></div>
 <div class="entry"><div class="sig"><b>render.capsule3d</b>( <i>ax, ay, az, bx, by, bz, radius, r, g, b, a, duration</i> )</div><div class="desc">Same, capsule between two points.</div></div>
 
@@ -624,7 +624,7 @@ speed:<span class="f">set_subtab</span>( page )</pre><div class="tw"><table><the
     <h1>fonts</h1>
     <div class="entry"><div class="sig"><b>render.create_font</b>( <i>name</i>, <i>size</i>, <em>[weight]</em>, <em>[flags]</em>, <em>[width]</em>, <em>[aa]</em> )</div><div class="desc">Makes a font. It&rsquo;s freed when your script unloads.</div></div>
 <div class="entry"><div class="sig"><b>font:get_size</b>( <i>str</i> ) <em>&rarr; w, h</em></div><div class="desc">Measure text in this font.</div></div>
-<div class="entry"><div class="sig"><b>font:text</b>( <i>x, y, r, g, b, a, str</i> ) <em>&middot;</em> <b>font:text_centered</b>( &hellip; )</div><div class="desc">Draw text.</div></div>
+<div class="entry"><div class="sig"><b>font:text</b>( <i>x, y, r, g, b, a, str</i>, <em>[align]</em> ) <em>&middot;</em> <b>font:text_centered</b>( &hellip; )</div><div class="desc">Draw text. <code>align</code> takes <code>enums.align.*</code>; <code>text_centered</code> is shorthand for the centred case.</div></div>
 <div class="entry"><div class="sig"><b>font:text_glow</b>( <i>x, y, r, g, b, a, gr, gg, gb, ga, str</i> )</div><div class="desc">Text with a glow behind it.</div></div>
 <div class="entry"><div class="sig"><b>render.fonts.menu</b> <em>&middot;</em> <b>menu_bold</b> <em>&middot;</em> <b>menu_tab</b></div><div class="desc">The menu&rsquo;s fonts, ready to use.</div></div>
 <pre><span class="k">local</span> f = <span class="f">render.create_font</span>( <span class="s">&quot;Verdana&quot;</span>, <span class="n">14</span>, <span class="n">500</span>,
@@ -648,6 +648,8 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <div class="entry"><div class="sig"><b>e:get_weapon</b>( ) <em>&rarr; weapon | nil</em></div><div class="desc">Their current weapon.</div></div>
 <div class="entry"><div class="sig"><b>e:get_animlayers</b>( ) <em>&rarr; table</em></div><div class="desc">All 13 animation layers, keyed <code>0..12</code>. Name them with <code>enums.animlayer</code>.</div></div>
 <div class="entry"><div class="sig"><b>e:get_animlayer</b>( <i>index</i> ) <em>&rarr; table | nil</em></div><div class="desc">Just one layer.</div></div>
+<div class="entry"><div class="sig"><b>e:get_net_layers</b>( ) <em>&rarr; table</em></div><div class="desc">The <strong>networked</strong> layers &mdash; what the server has, rather than what the cheat drives locally.</div></div>
+<div class="entry"><div class="sig"><b>e:get_animstate</b>( ) <em>&rarr; table | nil</em></div><div class="desc">Foot yaw, eye yaw, duck amount, velocity, ground and ladder state. Read only.</div></div>
 <pre><span class="k">for</span> _, p <span class="k">in</span> <span class="f">ipairs</span>( <span class="f">entity.get_players</span>( <span class="k">true</span> ) ) <span class="k">do</span>
     <span class="k">if</span> <span class="k">not</span> p:<span class="f">is_dormant</span>( ) <span class="k">then</span>
         <span class="k">local</span> o = p:<span class="f">get_origin</span>( )
@@ -665,7 +667,11 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
     <span class="k">if</span> l <span class="k">and</span> l.weight &gt; <span class="n">0</span> <span class="k">then</span>
         <span class="f">print</span>( enums.animlayer[ i ], l.sequence, l.weight, l.cycle )
     <span class="k">end</span>
-<span class="k">end</span></pre><div class="note ">Each layer has <code>sequence</code>, <code>cycle</code>, <code>prev_cycle</code>, <code>weight</code>, <code>weight_delta</code>, <code>playback_rate</code>, <code>anim_time</code>, <code>fade_out_time</code> and <code>order</code>.</div><div class="note warn"><strong>Your own layers come from what the cheat drove this tick</strong>, not from the entity&rsquo;s raw overlay &mdash; so a script and the cheat agree on them. Everyone else&rsquo;s come from their overlay.</div>
+<span class="k">end</span></pre><div class="note ">Each layer has <code>sequence</code>, <code>cycle</code>, <code>prev_cycle</code>, <code>weight</code>, <code>weight_delta</code>, <code>playback_rate</code>, <code>anim_time</code>, <code>fade_out_time</code> and <code>order</code>.</div><div class="note warn"><strong>Your own layers come from what the cheat drove this tick</strong>, not from the entity&rsquo;s raw overlay &mdash; so a script and the cheat agree on them. Everyone else&rsquo;s come from their overlay.</div><div class="note warn"><strong><code>get_net_layers</code> is delayed, and that is the point.</strong> For yourself it is the set the <em>server</em> is working from, which lags what you are actually doing by your latency &mdash; so comparing it against <code>get_animlayers</code> shows you the gap between what you are doing and what the server thinks you are doing. For anyone else their overlay already <em>is</em> the networked data, so the two return the same thing.<br><br>It is ground truth in the sense that the server acts on it; it is not current.</div><p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">animstate</p><pre><span class="k">local</span> a = p:<span class="f">get_animstate</span>( )
+
+<span class="c">-- eye yaw is where they look, foot yaw is where the body points.</span>
+<span class="c">-- the gap between them is the desync a resolver is solving.</span>
+<span class="f">print</span>( a.eye_yaw, a.foot_yaw, a.duck_amount, a.on_ground )</pre><div class="note ">Grouped as <strong>angles</strong> (<code>eye_yaw</code>, <code>foot_yaw</code>, <code>move_yaw</code>, <code>time_to_align</code>), <strong>movement</strong> (<code>velocity</code>, <code>speed</code>, <code>run_fraction</code>, <code>duration_moving</code>), <strong>stance</strong> (<code>duck_amount</code>), <strong>air</strong> (<code>on_ground</code>, <code>landing</code>, <code>duration_in_air</code>), <strong>ladder</strong> and a few flags. Read only &mdash; writing animstate is the cheat&rsquo;s job.</div>
   </div>
 
   <div class="page" id="p-netprops">
@@ -726,6 +732,7 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <div class="entry"><div class="sig"><b>enums.hitbox</b>[ <i>id</i> ]</div><div class="desc">All 20 hitboxes &mdash; <code>head</code>, <code>neck</code>, <code>pelvis</code>, <code>thorax</code>, <code>chest</code>, the limbs&hellip;</div></div>
 <div class="entry"><div class="sig"><b>enums.hitbox_id</b>[ <i>name</i> ]</div><div class="desc">The reverse &mdash; name to number.</div></div>
 <div class="entry"><div class="sig"><b>enums.animlayer</b>[ <i>id</i> ] <em>&middot;</em> <b>enums.animlayer_id</b>[ <i>name</i> ]</div><div class="desc">The 13 animation layers &mdash; <code>aimmatrix</code>, <code>weapon action</code>, <code>adjust</code>, <code>jump or fall</code>, <code>move</code>, <code>lean</code>&hellip;</div></div>
+<div class="entry"><div class="sig"><b>enums.align</b></div><div class="desc"><code>left</code>, <code>right</code>, <code>center</code> &mdash; for text drawing.</div></div>
 <div class="entry"><div class="sig"><b>enums.font_flags</b> <em>&middot;</em> <b>enums.font_aa</b></div><div class="desc">Font creation flags and smoothing modes.</div></div>
 <pre>cmd:<span class="f">strip_button</span>( enums.buttons.IN_JUMP )
 
