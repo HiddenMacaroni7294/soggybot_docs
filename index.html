@@ -154,6 +154,16 @@ body.searching .page{display:none!important}
   nav{columns:2}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* event blocks */
+.evt{padding-top:30px;margin-top:30px;border-top:1px solid var(--line)}
+.evt:first-of-type{border-top:0;margin-top:8px;padding-top:0}
+.evt-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 4px}
+.evt-h h2{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent);
+  margin:0;letter-spacing:-.01em}
+.evt-h .sigline{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.evt-d{color:var(--ink-2);max-width:68ch;margin:0 0 14px}
+.evt-d p{margin:0 0 8px}
+.evt-d p:last-child{margin:0}
 </style>
 
 <div class="edge"></div>
@@ -174,30 +184,33 @@ body.searching .page{display:none!important}
     <a data-p="overview">overview</a>
     <a data-p="callbacks">callbacks</a>
     <a data-p="examples">examples</a>
-
+    <p class="grp">events</p>
+    <a data-p="ev-move">move</a>
+    <a data-p="ev-visual">paint &amp; esp</a>
+    <a data-p="ev-aim">aimbot</a>
+    <a data-p="ev-game">game</a>
+    <a data-p="ev-world">world</a>
+    <p class="grp">objects</p>
+    <a data-p="obj-cmd">cmd</a>
+    <a data-p="obj-shot">shot</a>
+    <a data-p="obj-esp">esp</a>
+    <a data-p="obj-event">game event</a>
     <p class="grp">menu</p>
     <a data-p="ui">ui</a>
     <a data-p="subtabs">subtabs</a>
-
     <p class="grp">rendering</p>
     <a data-p="render">render</a>
     <a data-p="fonts">fonts</a>
-
     <p class="grp">entities</p>
     <a data-p="entity">entity</a>
     <a data-p="netprops">netprops</a>
     <a data-p="weapon">weapon</a>
     <a data-p="wpndata">weapon data</a>
-
-    <p class="grp">objects</p>
-    <a data-p="cmd">cmd</a>
-
     <p class="grp">misc</p>
     <a data-p="globals">globals</a>
     <a data-p="client">client</a>
-    <a data-p="buttons">buttons</a>
+    <a data-p="enums">enums</a>
     <a data-p="ffi">ffi</a>
-
     <p class="grp">reference</p>
     <a data-p="gotchas">gotchas</a>
   </nav>
@@ -206,437 +219,511 @@ body.searching .page{display:none!important}
 <main>
   <div id="results"></div>
 
-  <!-- ===================== overview ===================== -->
   <div class="page" id="p-overview">
     <p class="kicker">start</p>
     <h1>overview</h1>
-    <div class="intro">
-      <p>Put <code>.lua</code> files in <code>Documents\&lt;user&gt;\scripts\</code> and load them from the <strong>scripts</strong> tab.</p>
-      <p>Every script runs in its own sandbox, so scripts can't break each other. If a script errors it gets unloaded and the error is printed to console.</p>
-    </div>
-    <pre><span class="c">-- a minimal script</span>
-<span class="k">local</span> <span class="v">enabled</span> = <span class="f">ui.checkbox</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"my script"</span>, <span class="k">true</span> )
+    <div class="intro"><p>Put <code>.lua</code> files in <code>Documents\&lt;user&gt;\scripts\</code> and load them from the <strong>scripts</strong> tab.</p><p>Every script runs in its own sandbox, so scripts can&rsquo;t break each other. If a script errors it gets unloaded and the error is printed to console.</p></div>
+    <div class="note "><strong>Where things live.</strong> <code>ui</code> makes menu controls, <code>render</code> draws, <code>entity</code> reads the game, <code>callbacks</code> hooks events, <code>enums</code> holds the lookup tables. Anything unavailable comes back as <code>nil</code> rather than erroring.</div><pre><span class="c">-- a minimal script</span>
+<span class="k">local</span> enabled = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;my script&quot;</span>, <span class="k">true</span> )
 
-<span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( )
-    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( <span class="v">enabled</span> ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
-    <span class="f">render.text</span>( <span class="n">10</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">"hello"</span> )
+<span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
+    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( enabled ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+    <span class="f">render.text</span>( <span class="n">10</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">&quot;hello&quot;</span> )
 <span class="k">end</span> )</pre>
-    <div class="note"><strong>Where things live.</strong> <code>ui</code> makes menu controls, <code>render</code> draws, <code>entity</code> reads the game, <code>callbacks</code> hooks events. Everything returns <code>nil</code> rather than erroring when something isn't available.</div>
   </div>
 
-  <!-- ===================== callbacks ===================== -->
   <div class="page" id="p-callbacks">
     <p class="kicker">start</p>
     <h1>callbacks</h1>
-    <div class="intro"><p>Hook an event and your function runs whenever it fires.</p></div>
-    <div class="entry"><div class="sig"><b>callbacks.add</b>( <i>event</i>, <i>fn</i> )</div>
-      <div class="desc">Register a handler. You can add more than one per event.</div></div>
-    <div class="entry"><div class="sig"><b>callbacks.remove</b>( <i>event</i> )</div>
-      <div class="desc">Remove every handler your script added for that event.</div></div>
-
-    <h2 style="font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:30px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)">events</h2>
-    <div class="tw"><table>
-      <thead><tr><th>event</th><th>arg</th><th>use it for</th></tr></thead>
-      <tbody>
-        <tr><td><code>paint</code></td><td>&mdash;</td><td>Drawing. Fires every frame.</td></tr>
-        <tr><td><code>pre_move</code></td><td><code>cmd</code></td><td>Changing input before the cheat runs.</td></tr>
-        <tr><td><code>in_move</code></td><td><code>cmd</code></td><td>Reading weapon and player state.</td></tr>
-        <tr><td><code>post_move</code></td><td><code>cmd</code></td><td>Last chance to change the cmd.</td></tr>
-      </tbody>
-    </table></div>
-
-    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">paint</p>
-    <pre><span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( )
-    <span class="k">local</span> <span class="v">w</span>, <span class="v">h</span> = <span class="f">render.screen_size</span>( )
-    <span class="f">render.text</span>( <span class="v">w</span> - <span class="n">120</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">"soggybot"</span> )
-<span class="k">end</span> )</pre>
-    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">pre_move</p>
-    <pre><span class="c">-- auto-crouch while in the air</span>
-<span class="f">callbacks.add</span>( <span class="s">"pre_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
-    <span class="k">if</span> <span class="v">cmd</span>:<span class="f">has_button</span>( <span class="v">buttons</span>.<span class="v">IN_JUMP</span> ) <span class="k">then</span>
-        <span class="v">cmd</span>:<span class="f">add_button</span>( <span class="v">buttons</span>.<span class="v">IN_DUCK</span> )
-    <span class="k">end</span>
-<span class="k">end</span> )</pre>
-    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">in_move</p>
-    <pre><span class="c">-- stop moving when our accuracy is bad</span>
-<span class="f">callbacks.add</span>( <span class="s">"in_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
-    <span class="k">local</span> <span class="v">me</span> = <span class="f">entity.get_local_player</span>( )
-    <span class="k">local</span> <span class="v">w</span>  = <span class="v">me</span> <span class="k">and</span> <span class="v">me</span>:<span class="f">get_weapon</span>( )
-    <span class="k">if</span> <span class="k">not</span> <span class="v">w</span> <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
-
-    <span class="k">local</span> <span class="v">inacc</span> = <span class="v">w</span>:<span class="f">get_inaccuracy</span>( )
-    <span class="k">if</span> <span class="v">inacc</span> <span class="k">and</span> <span class="v">inacc</span> &gt; <span class="n">0.05</span> <span class="k">then</span>
-        <span class="v">cmd</span>:<span class="f">set_forwardmove</span>( <span class="n">0</span> )
-        <span class="v">cmd</span>:<span class="f">set_sidemove</span>( <span class="n">0</span> )
-    <span class="k">end</span>
-<span class="k">end</span> )</pre>
-    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">post_move</p>
-    <pre><span class="c">-- count the ticks we actually sent</span>
-<span class="k">local</span> <span class="v">sent</span> = <span class="n">0</span>
-
-<span class="f">callbacks.add</span>( <span class="s">"post_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
-    <span class="k">if</span> <span class="v">cmd</span>:<span class="f">get_send_packet</span>( ) <span class="k">then</span>
-        <span class="v">sent</span> = <span class="v">sent</span> + <span class="n">1</span>
-    <span class="k">end</span>
-<span class="k">end</span> )</pre>
-
-    <div class="note warn"><strong>Order matters for predicted values.</strong> <code>get_inaccuracy</code>, <code>get_spread</code>, <code>get_mode</code> and <code>can_fire</code> are predicted, so <em>when</em> you read them changes what you get:
-      <br><br>&middot; <code>pre_move</code> &mdash; one tick behind
-      <br>&middot; <code>in_move</code> &mdash; current, and what the aimbot is about to act on
-      <br>&middot; <code>post_move</code> &mdash; already updated for next tick
-      <br><br>Read them in <code>in_move</code> unless you specifically want otherwise.</div>
-    <div class="note"><code>in_move</code> does not fire while the doubletap key is held. <code>pre_move</code> and <code>post_move</code> still do.</div>
+    <div class="intro"><p>Hook an event and your function runs whenever it fires. You can add as many handlers as you like, and every script&rsquo;s handlers are independent.</p></div>
+    <div class="entry"><div class="sig"><b>callbacks.add</b>( <i>event</i>, <i>fn</i> )</div><div class="desc">Register a handler. Returns <code>false</code> and logs if the event name doesn&rsquo;t exist.</div></div>
+<div class="entry"><div class="sig"><b>callbacks.remove</b>( <i>event</i> )</div><div class="desc">Remove every handler your script added for that event.</div></div>
+<div class="tw"><table><thead><tr><th>group</th><th>events</th></tr></thead><tbody><tr><td><a data-p='ev-move' style='color:var(--accent)'>move</a></td><td><code>pre_move</code> <code>in_move</code> <code>post_move</code></td></tr><tr><td><a data-p='ev-visual' style='color:var(--accent)'>visuals</a></td><td><code>paint</code> <code>player_esp</code></td></tr><tr><td><a data-p='ev-aim' style='color:var(--accent)'>aimbot</a></td><td><code>aim_fire</code> <code>aim_hit</code> <code>aim_miss</code></td></tr><tr><td><a data-p='ev-game' style='color:var(--accent)'>game</a></td><td><code>player_hurt</code>, <code>player_death</code>, and any other game event</td></tr><tr><td><a data-p='ev-world' style='color:var(--accent)'>world</a></td><td><code>net_update_start</code> <code>net_update_end</code> <code>level_init</code> <code>level_shutdown</code></td></tr></tbody></table></div>
   </div>
 
-  <!-- ===================== examples ===================== -->
-  <div class="page" id="p-examples">
-    <p class="kicker">start</p>
-    <h1>examples</h1>
-    <div class="intro"><p>Complete scripts. Save any of these as a <code>.lua</code> file and load it.</p></div>
+  <div class="page" id="p-ev-move">
+    <p class="kicker">events</p>
+    <h1>move events</h1>
+    <div class="intro"><p>Three moments in the same tick, each handed the same <a data-p='obj-cmd' style='color:var(--accent)'>cmd</a> object.</p></div>
+    <div class="evt"><div class="evt-h"><h2>pre_move</h2><span class="sigline">function( cmd )</span></div><div class="evt-d"><p>The start of a tick, before the cheat has touched anything. Change movement or buttons here and the rest of the cheat sees your version.</p></div><pre><span class="c">-- auto-crouch whenever we jump</span>
+<span class="f">callbacks.add</span>( <span class="s">&quot;pre_move&quot;</span>, <span class="k">function</span>( cmd )
+    <span class="k">if</span> cmd:<span class="f">has_button</span>( enums.buttons.IN_JUMP ) <span class="k">then</span>
+        cmd:<span class="f">add_button</span>( enums.buttons.IN_DUCK )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre></div>
+<div class="evt"><div class="evt-h"><h2>in_move</h2><span class="sigline">function( cmd )</span></div><div class="evt-d"><p>The middle of a tick. Everything about your player and weapon is up to date, which makes it the right place to read state and decide what to do.</p><p>Doesn&rsquo;t fire while the doubletap key is held.</p></div><pre><span class="c">-- stop moving while our accuracy is bad</span>
+<span class="f">callbacks.add</span>( <span class="s">&quot;in_move&quot;</span>, <span class="k">function</span>( cmd )
+    <span class="k">local</span> me = <span class="f">entity.get_local_player</span>( )
+    <span class="k">local</span> w  = me <span class="k">and</span> me:<span class="f">get_weapon</span>( )
+    <span class="k">if</span> <span class="k">not</span> w <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
 
-    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">watermark with a toggle</p>
-    <pre><span class="k">local</span> <span class="v">on</span>   = <span class="f">ui.checkbox</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"watermark"</span>, <span class="k">true</span> )
-<span class="k">local</span> <span class="v">col</span>  = <span class="f">ui.color_picker</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"colour"</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span> )
-<span class="k">local</span> <span class="v">font</span> = <span class="f">render.create_font</span>( <span class="s">"Verdana"</span>, <span class="n">14</span>, <span class="n">500</span> )
+    <span class="k">local</span> inacc = w:<span class="f">get_inaccuracy</span>( )
+    <span class="k">if</span> inacc <span class="k">and</span> inacc &gt; <span class="n">0.05</span> <span class="k">then</span>
+        cmd:<span class="f">set_forwardmove</span>( <span class="n">0</span> )
+        cmd:<span class="f">set_sidemove</span>( <span class="n">0</span> )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre></div>
+<div class="evt"><div class="evt-h"><h2>post_move</h2><span class="sigline">function( cmd )</span></div><div class="evt-d"><p>The end of a tick, after the cheat has finished. Last chance to change anything before it goes to the server, and the only place <code>get_send_packet</code> is final.</p></div><pre><span class="c">-- how many ticks actually reached the server</span>
+<span class="k">local</span> sent, choked = <span class="n">0</span>, <span class="n">0</span>
 
-<span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( )
-    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( <span class="v">on</span> ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+<span class="f">callbacks.add</span>( <span class="s">&quot;post_move&quot;</span>, <span class="k">function</span>( cmd )
+    <span class="k">if</span> cmd:<span class="f">get_send_packet</span>( ) <span class="k">then</span> sent = sent + <span class="n">1</span>
+    <span class="k">else</span> choked = choked + <span class="n">1</span> <span class="k">end</span>
+<span class="k">end</span> )</pre></div>
+<div class="note warn"><strong>Order matters for predicted values.</strong> <code>get_inaccuracy</code>, <code>get_spread</code>, <code>get_mode</code> and <code>can_fire</code> are predicted, so <em>when</em> you read them changes what you get:<br><br>&middot; <code>pre_move</code> &mdash; one tick behind<br>&middot; <code>in_move</code> &mdash; current, and what the aimbot is about to act on<br>&middot; <code>post_move</code> &mdash; already rolled forward to next tick</div>
+  </div>
 
-    <span class="k">local</span> <span class="v">c</span>    = <span class="f">ui.get</span>( <span class="v">col</span> )
-    <span class="k">local</span> <span class="v">text</span> = <span class="f">string.format</span>( <span class="s">"soggybot | %d fps"</span>,
-                    <span class="n">1</span> / <span class="f">math.max</span>( <span class="f">globals.frametime</span>( ), <span class="n">0.0001</span> ) )
+  <div class="page" id="p-ev-visual">
+    <p class="kicker">events</p>
+    <h1>paint &amp; esp</h1>
+    <div class="evt"><div class="evt-h"><h2>paint</h2><span class="sigline">function( )</span></div><div class="evt-d"><p>Once per frame while you&rsquo;re in a game, after the world is drawn but before the menu. Everything in <code>render</code> only works from here.</p></div><pre><span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
+    <span class="k">local</span> w, h = <span class="f">render.screen_size</span>( )
+    <span class="f">render.text</span>( w - <span class="n">120</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">&quot;soggybot&quot;</span> )
+<span class="k">end</span> )</pre></div>
+<div class="evt"><div class="evt-h"><h2>player_esp</h2><span class="sigline">function( ctx )</span></div><div class="evt-d"><p>Once for every player whose ESP is on screen, after all the built-in elements have drawn &mdash; so anything you draw lands on top. Players who are dormant, faded out or off screen never reach it, so you don&rsquo;t need to filter.</p><p>Handed an <a data-p='obj-esp' style='color:var(--accent)'>esp</a> object.</p></div><pre><span class="f">callbacks.add</span>( <span class="s">&quot;player_esp&quot;</span>, <span class="k">function</span>( ctx )
+    <span class="k">local</span> p = ctx:<span class="f">get_player</span>( )
+    <span class="k">local</span> x, y, w, h = ctx:<span class="f">get_bbox</span>( )
 
-    <span class="k">local</span> <span class="v">tw</span>, <span class="v">th</span> = <span class="v">font</span>:<span class="f">get_size</span>( <span class="v">text</span> )
-    <span class="k">local</span> <span class="v">sw</span>     = <span class="f">render.screen_size</span>( )
-    <span class="k">local</span> <span class="v">x</span>, <span class="v">y</span>  = <span class="v">sw</span> - <span class="v">tw</span> - <span class="n">14</span>, <span class="n">10</span>
+    <span class="c">-- flags append below the built-in ones, same column and styling</span>
+    <span class="k">if</span> p:<span class="f">get_prop</span>( <span class="s">&quot;m_bHasDefuser&quot;</span> ) == <span class="n">1</span> <span class="k">then</span>
+        ctx:<span class="f">add_flag</span>( <span class="s">&quot;kit&quot;</span>, <span class="n">120</span>, <span class="n">220</span>, <span class="n">120</span> )
+    <span class="k">end</span>
 
-    <span class="f">render.rect_filled</span>( <span class="v">x</span> - <span class="n">5</span>, <span class="v">y</span> - <span class="n">3</span>, <span class="v">tw</span> + <span class="n">10</span>, <span class="v">th</span> + <span class="n">6</span>, <span class="n">0</span>, <span class="n">0</span>, <span class="n">0</span>, <span class="n">150</span> )
-    <span class="v">font</span>:<span class="f">text</span>( <span class="v">x</span>, <span class="v">y</span>, <span class="v">c</span>[<span class="n">1</span>], <span class="v">c</span>[<span class="n">2</span>], <span class="v">c</span>[<span class="n">3</span>], <span class="v">c</span>[<span class="n">4</span>], <span class="v">text</span> )
+    <span class="c">-- drawn on top of the built-in box</span>
+    <span class="f">render.rect</span>( x - <span class="n">2</span>, y - <span class="n">2</span>, w + <span class="n">4</span>, h + <span class="n">4</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">90</span> )
+<span class="k">end</span> )</pre></div>
+
+  </div>
+
+  <div class="page" id="p-ev-aim">
+    <p class="kicker">events</p>
+    <h1>aimbot events</h1>
+    <div class="intro"><p>All three are handed a <a data-p='obj-shot' style='color:var(--accent)'>shot</a> object. <code>aim_fire</code> fires immediately; the other two land later, when the server answers.</p></div>
+    <div class="evt"><div class="evt-h"><h2>aim_fire</h2><span class="sigline">function( shot )</span></div><div class="evt-d"><p>The aimbot pulled the trigger. Everything about the shot is captured at this moment, including what it aimed at.</p></div><pre><span class="c">-- a fired-shot log</span>
+<span class="f">callbacks.add</span>( <span class="s">&quot;aim_fire&quot;</span>, <span class="k">function</span>( s )
+    <span class="k">local</span> t = s:<span class="f">get_target</span>( )
+
+    <span class="f">client.log</span>( <span class="f">string.format</span>( <span class="s">&quot;fire -&gt; %s %s | hc %.0f%% | dmg %.0f&quot;</span>,
+        t <span class="k">and</span> t:<span class="f">get_name</span>( <span class="n">12</span> ) <span class="k">or</span> <span class="s">&quot;?&quot;</span>,
+        enums.hitbox[ s:<span class="f">get_hitbox</span>( ) ] <span class="k">or</span> <span class="s">&quot;?&quot;</span>,
+        s:<span class="f">get_hitchance</span>( ),
+        s:<span class="f">get_aim_damage</span>( ) ) )
+<span class="k">end</span> )</pre></div>
+<div class="evt"><div class="evt-h"><h2>aim_hit</h2><span class="sigline">function( shot )</span></div><div class="evt-d"><p>The server confirmed the shot landed. This is the only event where the <code>get_hurt_*</code> values mean anything.</p></div><pre><span class="c">-- aimed vs actually hit. the two disagreeing is a resolver miss</span>
+<span class="f">callbacks.add</span>( <span class="s">&quot;aim_hit&quot;</span>, <span class="k">function</span>( s )
+    <span class="k">local</span> aimed = enums.hitgroup[ s:<span class="f">get_hitgroup</span>( ) ]   <span class="k">or</span> <span class="s">&quot;?&quot;</span>
+    <span class="k">local</span> hit   = enums.hitgroup[ s:<span class="f">get_hurt_group</span>( ) ] <span class="k">or</span> <span class="s">&quot;?&quot;</span>
+
+    <span class="k">if</span> aimed ~= hit <span class="k">then</span>
+        <span class="f">client.color_log</span>( <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>,
+            <span class="f">string.format</span>( <span class="s">&quot;aimed %s but hit %s&quot;</span>, aimed, hit ) )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre></div>
+<div class="evt"><div class="evt-h"><h2>aim_miss</h2><span class="sigline">function( shot )</span></div><div class="evt-d"><p>The shot didn&rsquo;t land. <code>get_reason()</code> is one of <code>spread</code>, <code>resolver</code> or <code>unknown</code>.</p></div><pre><span class="c">-- tally misses by reason, and draw the tally</span>
+<span class="k">local</span> misses, total = { }, <span class="n">0</span>
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;aim_miss&quot;</span>, <span class="k">function</span>( s )
+    <span class="k">local</span> why = s:<span class="f">get_reason</span>( )
+
+    misses[ why ] = ( misses[ why ] <span class="k">or</span> <span class="n">0</span> ) + <span class="n">1</span>
+    total = total + <span class="n">1</span>
+
+    <span class="f">client.color_log</span>( <span class="n">235</span>, <span class="n">80</span>, <span class="n">80</span>,
+        <span class="f">string.format</span>( <span class="s">&quot;miss (%s) aimed %s at %.0f%%&quot;</span>,
+            why,
+            enums.hitbox[ s:<span class="f">get_hitbox</span>( ) ] <span class="k">or</span> <span class="s">&quot;?&quot;</span>,
+            s:<span class="f">get_hitchance</span>( ) ) )
+<span class="k">end</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
+    <span class="k">if</span> total == <span class="n">0</span> <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> y = <span class="n">300</span>
+    <span class="f">render.text</span>( <span class="n">12</span>, y, <span class="n">255</span>, <span class="n">255</span>, <span class="n">255</span>, <span class="n">255</span>, <span class="s">&quot;misses: &quot;</span> .. total )
+
+    <span class="k">for</span> why, n <span class="k">in</span> <span class="f">pairs</span>( misses ) <span class="k">do</span>
+        y = y + <span class="n">14</span>
+        <span class="f">render.text</span>( <span class="n">20</span>, y, <span class="n">235</span>, <span class="n">80</span>, <span class="n">80</span>, <span class="n">255</span>,
+            <span class="f">string.format</span>( <span class="s">&quot;%-9s %d (%.0f%%)&quot;</span>, why, n, n / total * <span class="n">100</span> ) )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre></div>
+<div class="note "><strong>Resetting between rounds</strong> pairs well with these &mdash; hook <code>round_start</code> and clear your tally there.</div><pre><span class="f">callbacks.add</span>( <span class="s">&quot;round_start&quot;</span>, <span class="k">function</span>( )
+    misses, total = { }, <span class="n">0</span>
 <span class="k">end</span> )</pre>
-    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">enemy health text</p>
-    <pre><span class="k">local</span> <span class="v">on</span> = <span class="f">ui.checkbox</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"health esp"</span>, <span class="k">true</span> )
+  </div>
 
-<span class="f">callbacks.add</span>( <span class="s">"paint"</span>, <span class="k">function</span>( )
-    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( <span class="v">on</span> ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+  <div class="page" id="p-ev-game">
+    <p class="kicker">events</p>
+    <h1>game events</h1>
+    <div class="intro"><p>Registered by name, same as anything else.</p></div>
+    <div class="evt"><div class="evt-h"><h2>any game event</h2><span class="sigline">function( event )</span></div><div class="evt-d"><p>Any event the game itself has &mdash; <code>player_hurt</code>, <code>player_death</code>, <code>weapon_fire</code>, <code>round_start</code>, <code>item_pickup</code>, and the rest. You don&rsquo;t need the cheat to already listen for it; asking subscribes to it.</p><p>Handed an <a data-p='obj-event' style='color:var(--accent)'>event</a> object.</p></div><pre><span class="c">-- damage we dealt, with the hitgroup named</span>
+<span class="f">callbacks.add</span>( <span class="s">&quot;player_hurt&quot;</span>, <span class="k">function</span>( e )
+    <span class="k">local</span> victim   = e:<span class="f">get_player</span>( <span class="s">&quot;userid&quot;</span> )
+    <span class="k">local</span> attacker = e:<span class="f">get_player</span>( <span class="s">&quot;attacker&quot;</span> )
+    <span class="k">local</span> me       = <span class="f">entity.get_local_player</span>( )
 
-    <span class="k">for</span> <span class="v">_</span>, <span class="v">p</span> <span class="k">in</span> <span class="f">ipairs</span>( <span class="f">entity.get_players</span>( <span class="k">true</span> ) ) <span class="k">do</span>
-        <span class="k">if</span> <span class="k">not</span> <span class="v">p</span>:<span class="f">is_dormant</span>( ) <span class="k">then</span>
-            <span class="k">local</span> <span class="v">o</span> = <span class="v">p</span>:<span class="f">get_origin</span>( )
-            <span class="k">local</span> <span class="v">s</span> = <span class="f">render.world_to_screen</span>( <span class="v">o</span>[<span class="n">1</span>], <span class="v">o</span>[<span class="n">2</span>], <span class="v">o</span>[<span class="n">3</span>] )
+    <span class="k">if</span> <span class="k">not</span> me <span class="k">or</span> <span class="k">not</span> attacker <span class="k">or</span> attacker:<span class="f">index</span>( ) ~= me:<span class="f">index</span>( ) <span class="k">then</span>
+        <span class="k">return</span>
+    <span class="k">end</span>
 
-            <span class="k">if</span> <span class="v">s</span> <span class="k">then</span>
-                <span class="k">local</span> <span class="v">hp</span> = <span class="v">p</span>:<span class="f">get_health</span>( )
-                <span class="f">render.text</span>( <span class="v">s</span>[<span class="n">1</span>], <span class="v">s</span>[<span class="n">2</span>],
-                    <span class="n">255</span> - <span class="v">hp</span> * <span class="n">2</span>, <span class="v">hp</span> * <span class="n">2</span>, <span class="n">40</span>, <span class="n">255</span>, <span class="f">tostring</span>( <span class="v">hp</span> ) )
-            <span class="k">end</span>
+    <span class="f">client.color_log</span>( <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>,
+        <span class="f">string.format</span>( <span class="s">&quot;hit %s in the %s for %d (%d left)&quot;</span>,
+            victim <span class="k">and</span> victim:<span class="f">get_name</span>( <span class="n">12</span> ) <span class="k">or</span> <span class="s">&quot;?&quot;</span>,
+            enums.hitgroup[ e:<span class="f">get_int</span>( <span class="s">&quot;hitgroup&quot;</span> ) ] <span class="k">or</span> <span class="s">&quot;?&quot;</span>,
+            e:<span class="f">get_int</span>( <span class="s">&quot;dmg_health&quot;</span> ),
+            e:<span class="f">get_int</span>( <span class="s">&quot;health&quot;</span> ) ) )
+<span class="k">end</span> )</pre></div>
+<p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">a kill feed</p><pre><span class="f">callbacks.add</span>( <span class="s">&quot;player_death&quot;</span>, <span class="k">function</span>( e )
+    <span class="k">local</span> victim   = e:<span class="f">get_player</span>( <span class="s">&quot;userid&quot;</span> )
+    <span class="k">local</span> attacker = e:<span class="f">get_player</span>( <span class="s">&quot;attacker&quot;</span> )
+
+    <span class="f">client.log</span>( <span class="f">string.format</span>( <span class="s">&quot;%s killed %s with %s%s&quot;</span>,
+        attacker <span class="k">and</span> attacker:<span class="f">get_name</span>( <span class="n">12</span> ) <span class="k">or</span> <span class="s">&quot;?&quot;</span>,
+        victim   <span class="k">and</span> victim:<span class="f">get_name</span>( <span class="n">12</span> )   <span class="k">or</span> <span class="s">&quot;?&quot;</span>,
+        e:<span class="f">get_string</span>( <span class="s">&quot;weapon&quot;</span> ),
+        e:<span class="f">get_bool</span>( <span class="s">&quot;headshot&quot;</span> ) <span class="k">and</span> <span class="s">&quot; (hs)&quot;</span> <span class="k">or</span> <span class="s">&quot;&quot;</span> ) )
+<span class="k">end</span> )</pre><div class="note warn"><strong>A name the game doesn&rsquo;t have returns <code>false</code> and logs &ldquo;no such event&rdquo;</strong>, so a typo&rsquo;d event tells you instead of silently never firing.</div>
+  </div>
+
+  <div class="page" id="p-ev-world">
+    <p class="kicker">events</p>
+    <h1>world events</h1>
+    <div class="evt"><div class="evt-h"><h2>net_update_start</h2><span class="sigline">function( )</span></div><div class="evt-d"><p>Before the game applies a network update.</p></div></div>
+<div class="evt"><div class="evt-h"><h2>net_update_end</h2><span class="sigline">function( )</span></div><div class="evt-d"><p>After the game has applied a network update &mdash; entity positions and properties are fresh here.</p></div><pre><span class="f">callbacks.add</span>( <span class="s">&quot;net_update_end&quot;</span>, <span class="k">function</span>( )
+    <span class="k">for</span> _, p <span class="k">in</span> <span class="f">ipairs</span>( <span class="f">entity.get_players</span>( <span class="k">true</span> ) ) <span class="k">do</span>
+        <span class="k">if</span> <span class="k">not</span> p:<span class="f">is_dormant</span>( ) <span class="k">then</span>
+            <span class="c">-- freshest data you can get for enemies</span>
         <span class="k">end</span>
     <span class="k">end</span>
-<span class="k">end</span> )</pre>
-    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">its own subtab, with a hotkey</p>
-    <pre><span class="k">local</span> <span class="v">page</span>  = <span class="f">ui.subtab</span>( <span class="s">"scripts"</span>, <span class="s">"slowwalk"</span> )
-<span class="k">local</span> <span class="v">key</span>   = <span class="f">ui.hotkey</span>( <span class="s">"scripts"</span>, <span class="n">0</span>, <span class="s">"slowwalk key"</span> )
-<span class="k">local</span> <span class="v">speed</span> = <span class="f">ui.slider</span>( <span class="s">"scripts"</span>, <span class="n">0</span>, <span class="s">"speed"</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
+<span class="k">end</span> )</pre></div>
+<div class="evt"><div class="evt-h"><h2>level_init</h2><span class="sigline">function( )</span></div><div class="evt-d"><p>A map finished loading. Good place to reset per-map state.</p></div><pre><span class="k">local</span> seen = { }
 
-<span class="f">ui.set_subtab</span>( <span class="v">key</span>, <span class="v">page</span> )
-<span class="f">ui.set_subtab</span>( <span class="v">speed</span>, <span class="v">page</span> )
-
-<span class="f">callbacks.add</span>( <span class="s">"pre_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
-    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( <span class="v">key</span> ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
-
-    <span class="k">local</span> <span class="v">want</span> = <span class="f">ui.get</span>( <span class="v">speed</span> )
-    <span class="k">local</span> <span class="v">f</span>, <span class="v">s</span> = <span class="v">cmd</span>:<span class="f">get_forwardmove</span>( ), <span class="v">cmd</span>:<span class="f">get_sidemove</span>( )
-    <span class="k">local</span> <span class="v">len</span>  = <span class="f">math.sqrt</span>( <span class="v">f</span> * <span class="v">f</span> + <span class="v">s</span> * <span class="v">s</span> )
-
-    <span class="k">if</span> <span class="v">len</span> &gt; <span class="v">want</span> <span class="k">then</span>
-        <span class="v">cmd</span>:<span class="f">set_forwardmove</span>( <span class="v">f</span> / <span class="v">len</span> * <span class="v">want</span> )
-        <span class="v">cmd</span>:<span class="f">set_sidemove</span>( <span class="v">s</span> / <span class="v">len</span> * <span class="v">want</span> )
-    <span class="k">end</span>
-<span class="k">end</span> )</pre>
-    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">reacting to a menu change</p>
-    <pre><span class="k">local</span> <span class="v">mode</span>  = <span class="f">ui.combobox</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"mode"</span>, <span class="s">"off"</span>, <span class="s">"low"</span>, <span class="s">"high"</span> )
-<span class="k">local</span> <span class="v">power</span> = <span class="f">ui.slider</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"power"</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
-
-<span class="c">-- hide the slider unless a mode is picked</span>
-<span class="f">ui.set_callback</span>( <span class="v">mode</span>, <span class="k">function</span>( )
-    <span class="f">ui.set_visible</span>( <span class="v">power</span>, <span class="f">ui.get</span>( <span class="v">mode</span> ) ~= <span class="n">0</span> )
-<span class="k">end</span> )</pre>
+<span class="f">callbacks.add</span>( <span class="s">&quot;level_init&quot;</span>, <span class="k">function</span>( )
+    seen = { }
+<span class="k">end</span> )</pre></div>
+<div class="evt"><div class="evt-h"><h2>level_shutdown</h2><span class="sigline">function( )</span></div><div class="evt-d"><p>Leaving a map.</p></div></div>
+<div class="note warn"><strong>These are per map, not per session.</strong> <code>level_init</code> and <code>level_shutdown</code> fire on every map change and every reconnect, not once when you start the game.<br><br>The two <code>net_update</code> events are also skipped on a full update, which happens right after a map load.</div>
   </div>
 
-  <!-- ===================== ui ===================== -->
+  <div class="page" id="p-obj-cmd">
+    <p class="kicker">objects</p>
+    <h1>cmd</h1>
+    <div class="intro"><p>Handed to the <a data-p='ev-move' style='color:var(--accent)'>move events</a>. It&rsquo;s how you change what gets sent to the server.</p></div>
+    <div class="entry"><div class="sig"><b>cmd:get_yaw</b>( ) <em>&middot;</em> <b>cmd:set_yaw</b>( <i>v</i> )</div><div class="desc">Also <code>pitch</code> and <code>roll</code>.</div></div>
+<div class="entry"><div class="sig"><b>cmd:get_forwardmove</b>( ) <em>&middot;</em> <b>cmd:set_forwardmove</b>( <i>v</i> )</div><div class="desc">Also <code>sidemove</code> and <code>upmove</code>.</div></div>
+<div class="entry"><div class="sig"><b>cmd:get_send_packet</b>( ) <em>&middot;</em> <b>cmd:set_send_packet</b>( <i>bool</i> )</div><div class="desc">Whether this tick is sent to the server.</div></div>
+<div class="entry"><div class="sig"><b>cmd:get_weaponselect</b>( ) <em>&middot;</em> <b>cmd:set_weaponselect</b>( <i>v</i> )</div><div class="desc">Weapon switch.</div></div>
+<div class="entry"><div class="sig"><b>cmd:add_button</b>( <i>bit</i> ) <em>&middot;</em> <b>cmd:strip_button</b>( <i>bit</i> ) <em>&middot;</em> <b>cmd:has_button</b>( <i>bit</i> )</div><div class="desc">Add, remove or test a button. See <a data-p='enums' style='color:var(--accent)'>enums</a>.</div></div>
+<div class="entry"><div class="sig"><b>cmd:get_buttons</b>( ) <em>&middot;</em> <b>cmd:get_command_number</b>( ) <em>&middot;</em> <b>cmd:get_tick</b>( ) <em>&middot;</em> <b>cmd:get_random_seed</b>( )<span class="pill">read only</span></div><div class="desc">Changing these would desync you from the server.</div></div>
+<div class="note warn"><strong><code>IN_ATTACK</code> is handled by the cheat.</strong> You can&rsquo;t remove it &mdash; the aimbot already decided. You can add it, but only when <code>client.can_fire()</code> is true. Both calls return <code>false</code> if the attack bit was ignored.</div><div class="note "><strong>Only use <code>cmd</code> inside the callback that gave it to you.</strong> Don&rsquo;t save it in a variable for later.</div>
+  </div>
+
+  <div class="page" id="p-obj-shot">
+    <p class="kicker">objects</p>
+    <h1>shot</h1>
+    <div class="intro"><p>Handed to the <a data-p='ev-aim' style='color:var(--accent)'>aimbot events</a>. Everything is captured when the shot is fired, so it still describes that shot when it resolves a moment later.</p></div>
+    <div class="entry"><div class="sig"><b>shot:get_target</b>( ) <em>&rarr; entity | nil</em></div><div class="desc">Who we shot at.</div></div>
+<div class="entry"><div class="sig"><b>shot:get_hitbox</b>( ) <em>&middot;</em> <b>shot:get_hitgroup</b>( )</div><div class="desc">What we <strong>aimed at</strong>. Name them with <code>enums.hitbox</code> / <code>enums.hitgroup</code>.</div></div>
+<div class="entry"><div class="sig"><b>shot:get_hitchance</b>( ) <em>&middot;</em> <b>shot:get_point_hitchance</b>( )</div><div class="desc">The final hitchance, and the aimed point&rsquo;s own.</div></div>
+<div class="entry"><div class="sig"><b>shot:get_aim_damage</b>( ) <em>&middot;</em> <b>shot:get_avg_damage</b>( )</div><div class="desc">Predicted damage, and the mean across the spread seeds that connected.</div></div>
+<div class="entry"><div class="sig"><b>shot:is_lethal</b>( ) <em>&middot;</em> <b>shot:is_penetrated</b>( ) <em>&middot;</em> <b>shot:get_overlap</b>( )</div><div class="desc">Whether the point would kill, went through a wall, and its safepoint score (<code>-1</code> = not scored).</div></div>
+<div class="entry"><div class="sig"><b>shot:get_hurt_group</b>( ) <em>&middot;</em> <b>shot:get_hurt_damage</b>( ) <em>&middot;</em> <b>shot:get_hurt_health</b>( )<span class="pill warn">aim_hit</span></div><div class="desc">What the <strong>server said</strong>. Only meaningful in <code>aim_hit</code>.</div></div>
+<div class="entry"><div class="sig"><b>shot:get_reason</b>( )<span class="pill warn">aim_miss</span></div><div class="desc">Why it missed: <code>spread</code>, <code>resolver</code> or <code>unknown</code>. Empty otherwise.</div></div>
+<div class="entry"><div class="sig"><b>shot:get_damage</b>( ) <em>&middot;</em> <b>shot:get_time</b>( ) <em>&middot;</em> <b>shot:get_latency</b>( ) <em>&middot;</em> <b>shot:get_weapon_id</b>( )</div><div class="desc">Shot damage, when it was fired, your latency at the time, and the weapon.</div></div>
+<div class="note "><strong>There are two hitgroups on purpose.</strong> <code>get_hitgroup()</code> is what the aimbot aimed at; <code>get_hurt_group()</code> is what the server says was hit. Them disagreeing is exactly what a resolver miss looks like.</div>
+  </div>
+
+  <div class="page" id="p-obj-esp">
+    <p class="kicker">objects</p>
+    <h1>esp</h1>
+    <div class="intro"><p>Handed to <a data-p='ev-visual' style='color:var(--accent)'>player_esp</a>, once per player per frame.</p></div>
+    <div class="entry"><div class="sig"><b>ctx:get_player</b>( ) <em>&rarr; entity</em></div><div class="desc">The player being drawn.</div></div>
+<div class="entry"><div class="sig"><b>ctx:get_bbox</b>( ) <em>&rarr; x, y, w, h</em></div><div class="desc">The box on screen. Always valid &mdash; a player whose box can&rsquo;t be projected never reaches the callback.</div></div>
+<div class="entry"><div class="sig"><b>ctx:add_flag</b>( <i>text</i>, <em>[r]</em>, <em>[g]</em>, <em>[b]</em> )</div><div class="desc">Adds a flag below the built-in ones, in the same column with the same styling.</div></div>
+<div class="entry"><div class="sig"><b>ctx:get_flag_count</b>( )</div><div class="desc">How many built-in flags this player already has.</div></div>
+<div class="note "><strong>Only valid inside the callback.</strong> Don&rsquo;t hold onto it.</div>
+  </div>
+
+  <div class="page" id="p-obj-event">
+    <p class="kicker">objects</p>
+    <h1>game event</h1>
+    <div class="intro"><p>Handed to <a data-p='ev-game' style='color:var(--accent)'>game events</a>.</p></div>
+    <div class="entry"><div class="sig"><b>e:get_name</b>( )</div><div class="desc">The event&rsquo;s name.</div></div>
+<div class="entry"><div class="sig"><b>e:get_int</b>( <i>key</i> ) <em>&middot;</em> <b>e:get_float</b>( <i>key</i> ) <em>&middot;</em> <b>e:get_bool</b>( <i>key</i> ) <em>&middot;</em> <b>e:get_string</b>( <i>key</i> )</div><div class="desc">Read a field by name. Keys are the game&rsquo;s own &mdash; <code>userid</code>, <code>dmg_health</code>, <code>weapon</code>&hellip;</div></div>
+<div class="entry"><div class="sig"><b>e:get_player</b>( <i>key</i> ) <em>&rarr; entity | nil</em></div><div class="desc">Reads a userid field and gives you the entity. Userids aren&rsquo;t entity indices, so this saves doing the conversion yourself.</div></div>
+<div class="note "><strong>Only valid inside the callback.</strong> The game reuses the event object immediately afterwards.</div>
+  </div>
+
   <div class="page" id="p-ui">
     <p class="kicker">menu</p>
     <h1>ui</h1>
-    <div class="intro"><p>Creators take <code>(tab, column, name, …)</code> and give you a handle. <code>column</code> is <code>0</code> or <code>1</code>.</p></div>
-    <pre><span class="k">local</span> <span class="v">a</span> = <span class="f">ui.checkbox</span>    ( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"enabled"</span>, <span class="k">true</span> )
-<span class="k">local</span> <span class="v">b</span> = <span class="f">ui.slider</span>      ( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"amount"</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
-<span class="k">local</span> <span class="v">c</span> = <span class="f">ui.combobox</span>    ( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"mode"</span>, <span class="s">"one"</span>, <span class="s">"two"</span> )
-<span class="k">local</span> <span class="v">d</span> = <span class="f">ui.color_picker</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"colour"</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span> )
-
-<span class="f">ui.button</span>( <span class="s">"scripts"</span>, <span class="n">1</span>, <span class="s">"do it"</span>, <span class="k">function</span>( )
-    <span class="f">print</span>( <span class="f">ui.get</span>( <span class="v">b</span> ) )
-<span class="k">end</span> )</pre>
+    <div class="intro"><p>Creators take <code>(tab, column, name, &hellip;)</code> and give you a handle. <code>column</code> is <code>0</code> or <code>1</code>.</p></div>
     <div class="entry"><div class="sig"><b>ui.checkbox</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <em>[default]</em> )</div><div class="desc">On/off toggle.</div></div>
-    <div class="entry"><div class="sig"><b>ui.slider</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>min</i>, <i>max</i>, <em>[default]</em> )</div><div class="desc">Number in a range.</div></div>
-    <div class="entry"><div class="sig"><b>ui.combobox</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>…items</i> )</div><div class="desc">Pick one. <code>ui.get</code> gives the index.</div></div>
-    <div class="entry"><div class="sig"><b>ui.multiselect</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>…items</i> )</div><div class="desc">Pick several. <code>ui.get</code> gives an array of indices.</div></div>
-    <div class="entry"><div class="sig"><b>ui.hotkey</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc"><code>ui.get</code> gives whether it's currently active.</div></div>
-    <div class="entry"><div class="sig"><b>ui.color_picker</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <em>[r]</em>, <em>[g]</em>, <em>[b]</em>, <em>[a]</em> )</div><div class="desc"><code>ui.get</code> gives <code>{r,g,b,a}</code>.</div></div>
-    <div class="entry"><div class="sig"><b>ui.button</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>fn</i> )</div><div class="desc">Runs <code>fn</code> when clicked.</div></div>
-    <div class="entry"><div class="sig"><b>ui.intbox</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc">Number entry field.</div></div>
-    <div class="entry"><div class="sig"><b>ui.get</b>( <i>handle</i> ) <em>·</em> <b>ui.set</b>( <i>handle</i>, <i>value</i> )</div><div class="desc">Read and write a control's value.</div></div>
-    <div class="entry"><div class="sig"><b>ui.name</b>( <i>handle</i> ) <em>·</em> <b>ui.set_visible</b>( <i>handle</i>, <i>bool</i> )</div><div class="desc">Label, and show/hide.</div></div>
-    <div class="entry"><div class="sig"><b>ui.set_callback</b>( <i>handle</i>, <i>fn</i> )</div><div class="desc">Runs <code>fn</code> when the value changes. One per control — setting it again replaces the old one.</div></div>
-    <div class="note"><strong>Values save automatically</strong> with the config, and load correctly even if the config was loaded before your script was.</div>
+<div class="entry"><div class="sig"><b>ui.slider</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>min</i>, <i>max</i>, <em>[default]</em> )</div><div class="desc">Number in a range.</div></div>
+<div class="entry"><div class="sig"><b>ui.combobox</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>&hellip;items</i> )</div><div class="desc">Pick one. <code>ui.get</code> gives the index.</div></div>
+<div class="entry"><div class="sig"><b>ui.multiselect</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>&hellip;items</i> )</div><div class="desc">Pick several. <code>ui.get</code> gives an array of indices.</div></div>
+<div class="entry"><div class="sig"><b>ui.hotkey</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc"><code>ui.get</code> gives whether it&rsquo;s currently active.</div></div>
+<div class="entry"><div class="sig"><b>ui.color_picker</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <em>[r]</em>, <em>[g]</em>, <em>[b]</em>, <em>[a]</em> )</div><div class="desc"><code>ui.get</code> gives <code>{r,g,b,a}</code>.</div></div>
+<div class="entry"><div class="sig"><b>ui.button</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>fn</i> )</div><div class="desc">Runs <code>fn</code> when clicked.</div></div>
+<div class="entry"><div class="sig"><b>ui.intbox</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc">Number entry field.</div></div>
+<div class="entry"><div class="sig"><b>ui.get</b>( <i>handle</i> ) <em>&middot;</em> <b>ui.set</b>( <i>handle</i>, <i>value</i> )</div><div class="desc">Read and write a control&rsquo;s value.</div></div>
+<div class="entry"><div class="sig"><b>ui.name</b>( <i>handle</i> ) <em>&middot;</em> <b>ui.set_visible</b>( <i>handle</i>, <i>bool</i> )</div><div class="desc">Label, and show/hide.</div></div>
+<div class="entry"><div class="sig"><b>ui.set_callback</b>( <i>handle</i>, <i>fn</i> )</div><div class="desc">Runs when the value changes. One per control &mdash; setting it again replaces the old one.</div></div>
+<pre><span class="k">local</span> mode  = <span class="f">ui.combobox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;mode&quot;</span>, <span class="s">&quot;off&quot;</span>, <span class="s">&quot;low&quot;</span>, <span class="s">&quot;high&quot;</span> )
+<span class="k">local</span> power = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;power&quot;</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
+
+<span class="c">-- hide the slider unless a mode is picked</span>
+<span class="f">ui.set_callback</span>( mode, <span class="k">function</span>( )
+    <span class="f">ui.set_visible</span>( power, <span class="f">ui.get</span>( mode ) ~= <span class="n">0</span> )
+<span class="k">end</span> )</pre><div class="note "><strong>Values save automatically</strong> with the config, and load correctly even if the config was loaded before your script was.</div>
   </div>
 
-  <!-- ===================== subtabs ===================== -->
   <div class="page" id="p-subtabs">
     <p class="kicker">menu</p>
     <h1>subtabs</h1>
-    <div class="intro"><p>Give your script its own page so its controls aren't mixed in with everything else.</p></div>
-    <pre><span class="k">local</span> <span class="v">page</span> = <span class="f">ui.subtab</span>( <span class="s">"scripts"</span>, <span class="s">"my script"</span> )
+    <div class="intro"><p>Give your script its own page so its controls aren&rsquo;t mixed in with everything else.</p></div>
+    <div class="entry"><div class="sig"><b>ui.subtab</b>( <i>tab</i>, <i>name</i>, <em>[left_title]</em>, <em>[right_title]</em> )</div><div class="desc">Adds a page and returns it. Column titles are optional.</div></div>
+<div class="entry"><div class="sig"><b>ui.set_subtab</b>( <i>handle</i>, <i>page</i> )</div><div class="desc">Moves a control to that page.</div></div>
+<pre><span class="k">local</span> page  = <span class="f">ui.subtab</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;slowwalk&quot;</span>, <span class="s">&quot;SLOWWALK&quot;</span>, <span class="s">&quot;OPTIONS&quot;</span> )
+<span class="k">local</span> key   = <span class="f">ui.hotkey</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;key&quot;</span> )
+<span class="k">local</span> speed = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;speed&quot;</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
 
-<span class="k">local</span> <span class="v">a</span> = <span class="f">ui.checkbox</span>( <span class="s">"scripts"</span>, <span class="n">0</span>, <span class="s">"enabled"</span> )
-<span class="f">ui.set_subtab</span>( <span class="v">a</span>, <span class="v">page</span> )</pre>
-    <div class="entry"><div class="sig"><b>ui.subtab</b>( <i>tab</i>, <i>name</i>, <em>[left_title]</em>, <em>[right_title]</em> )</div>
-      <div class="desc">Adds a page and returns it. Column titles are optional.</div></div>
-    <div class="entry"><div class="sig"><b>ui.set_subtab</b>( <i>handle</i>, <i>page</i> )</div>
-      <div class="desc">Moves a control to that page.</div></div>
-    <div class="tw"><table>
-      <thead><tr><th></th><th>where your controls show up</th></tr></thead>
-      <tbody>
-        <tr><td><strong>with a subtab</strong></td><td>Your own page, both columns.</td></tr>
-        <tr><td><strong>without</strong></td><td>The main page, column 1, only while your script is selected in the list.</td></tr>
-      </tbody>
-    </table></div>
+<span class="f">ui.set_subtab</span>( key, page )
+<span class="f">ui.set_subtab</span>( speed, page )</pre><div class="tw"><table><thead><tr><th></th><th>where your controls show up</th></tr></thead><tbody><tr><td><strong>with a subtab</strong></td><td>Your own page, both columns.</td></tr><tr><td><strong>without</strong></td><td>The main page, column 1, only while your script is selected in the list.</td></tr></tbody></table></div>
   </div>
 
-  <!-- ===================== render ===================== -->
   <div class="page" id="p-render">
     <p class="kicker">rendering</p>
     <h1>render</h1>
-    <div class="intro"><p>Call these from <code>paint</code>. Colours are always separate <code>r, g, b, a</code> numbers.</p></div>
-    <div class="entry"><div class="sig"><b>render.rect</b>( <i>x, y, w, h, r, g, b, a</i> ) <em>·</em> <b>render.rect_filled</b>( … )</div><div class="desc">Outline and fill.</div></div>
-    <div class="entry"><div class="sig"><b>render.rect_rounded</b>( <i>x, y, w, h, radius, r, g, b, a</i>, <em>[segs]</em> )</div><div class="desc">Also <code>rect_filled_rounded</code>.</div></div>
-    <div class="entry"><div class="sig"><b>render.rect_outlined</b>( <i>x, y, w, h, r, g, b, a, r2, g2, b2, a2</i> )</div><div class="desc">Outline with two colours.</div></div>
-    <div class="entry"><div class="sig"><b>render.rect_filled_fade</b>( <i>x, y, w, h, r, g, b, a, a1, a2</i> )</div><div class="desc">Fill that fades between two alphas.</div></div>
-    <div class="entry"><div class="sig"><b>render.rect_filled_4</b>( <i>x, y, w, h, tl, tr, br, bl</i> )</div><div class="desc">A colour per corner, each a <code>{r,g,b,a}</code> table.</div></div>
-    <div class="entry"><div class="sig"><b>render.gradient</b>( … ) <em>·</em> <b>render.gradient_v</b>( … )</div><div class="desc">Horizontal and vertical two-colour fills.</div></div>
-    <div class="entry"><div class="sig"><b>render.line</b>( <i>x0, y0, x1, y1, r, g, b, a</i> )</div><div class="desc">A line.</div></div>
-    <div class="entry"><div class="sig"><b>render.circle</b>( <i>x, y, radius, segments, r, g, b, a</i> )</div><div class="desc">Filled circle.</div></div>
-    <div class="entry"><div class="sig"><b>render.arc</b>( <i>x, y, r_inner, r_outer, start_rad, sweep_rad, segs, r, g, b, a</i> )</div><div class="desc">Ring slice, for radial timers.</div></div>
-    <div class="entry"><div class="sig"><b>render.triangle</b>( <i>x0, y0, x1, y1, x2, y2, r, g, b, a</i>, <em>[arrow]</em> )</div><div class="desc">Filled triangle.</div></div>
-    <div class="entry"><div class="sig"><b>render.rect_glow</b>( <i>x, y, w, h, r, g, b, a, spread</i>, <em>[segs]</em>, <em>[radius]</em> )</div><div class="desc">Glow behind a box. Draw the box on top.</div></div>
-    <div class="entry"><div class="sig"><b>render.gradient_glow</b>( <i>x, y, w, r, g, b, a, r2, g2, b2, a2, spread</i> )</div><div class="desc">Glow with a colour at each end.</div></div>
-    <div class="entry"><div class="sig"><b>render.screen_size</b>( ) <em>→ w, h</em></div><div class="desc">Screen size in pixels.</div></div>
-    <div class="entry"><div class="sig"><b>render.world_to_screen</b>( <i>x, y, z</i> ) <em>→ {x,y} | nil</em></div><div class="desc"><code>nil</code> when the point is off-screen.</div></div>
-    <div class="entry"><div class="sig"><b>render.text</b>( <i>x, y, r, g, b, a, str</i> ) <em>·</em> <b>render.measure_text</b>( <i>str</i> )</div>
-      <div class="desc">Uses the default menu font. For any other font see <a data-p="fonts" style="color:var(--accent)">fonts</a>.</div></div>
-    <div class="entry"><div class="sig"><b>render.box3d</b>( <i>x, y, z, pitch, yaw, roll, mins, maxs, r, g, b, a, duration</i> )</div>
-      <div class="desc">3D box that stays for <code>duration</code> seconds. Call it <strong>once</strong>, not every frame.</div></div>
-    <div class="entry"><div class="sig"><b>render.capsule3d</b>( <i>ax, ay, az, bx, by, bz, radius, r, g, b, a, duration</i> )</div>
-      <div class="desc">Same, capsule between two points.</div></div>
+    <div class="intro"><p>Call these from <code>paint</code> or <code>player_esp</code>. Colours are always separate <code>r, g, b, a</code> numbers.</p></div>
+    <div class="entry"><div class="sig"><b>render.rect</b>( <i>x, y, w, h, r, g, b, a</i> ) <em>&middot;</em> <b>render.rect_filled</b>( &hellip; )</div><div class="desc">Outline and fill.</div></div>
+<div class="entry"><div class="sig"><b>render.rect_rounded</b>( <i>x, y, w, h, radius, r, g, b, a</i>, <em>[segs]</em> )</div><div class="desc">Also <code>rect_filled_rounded</code>.</div></div>
+<div class="entry"><div class="sig"><b>render.rect_outlined</b>( <i>x, y, w, h, r, g, b, a, r2, g2, b2, a2</i> )</div><div class="desc">Outline with two colours.</div></div>
+<div class="entry"><div class="sig"><b>render.rect_filled_fade</b>( <i>x, y, w, h, r, g, b, a, a1, a2</i> )</div><div class="desc">Fill that fades between two alphas.</div></div>
+<div class="entry"><div class="sig"><b>render.rect_filled_4</b>( <i>x, y, w, h, tl, tr, br, bl</i> )</div><div class="desc">A colour per corner, each a <code>{r,g,b,a}</code> table.</div></div>
+<div class="entry"><div class="sig"><b>render.gradient</b>( &hellip; ) <em>&middot;</em> <b>render.gradient_v</b>( &hellip; )</div><div class="desc">Horizontal and vertical two-colour fills.</div></div>
+<div class="entry"><div class="sig"><b>render.line</b>( <i>x0, y0, x1, y1, r, g, b, a</i> )</div><div class="desc">A line.</div></div>
+<div class="entry"><div class="sig"><b>render.circle</b>( <i>x, y, radius, segments, r, g, b, a</i> )</div><div class="desc">Filled circle.</div></div>
+<div class="entry"><div class="sig"><b>render.arc</b>( <i>x, y, r_inner, r_outer, start_rad, sweep_rad, segs, r, g, b, a</i> )</div><div class="desc">Ring slice, for radial timers.</div></div>
+<div class="entry"><div class="sig"><b>render.triangle</b>( <i>x0, y0, x1, y1, x2, y2, r, g, b, a</i>, <em>[arrow]</em> )</div><div class="desc">Filled triangle.</div></div>
+<div class="entry"><div class="sig"><b>render.rect_glow</b>( <i>x, y, w, h, r, g, b, a, spread</i>, <em>[segs]</em>, <em>[radius]</em> )</div><div class="desc">Glow behind a box. Draw the box on top.</div></div>
+<div class="entry"><div class="sig"><b>render.gradient_glow</b>( <i>x, y, w, r, g, b, a, r2, g2, b2, a2, spread</i> )</div><div class="desc">Glow with a colour at each end.</div></div>
+<div class="entry"><div class="sig"><b>render.screen_size</b>( ) <em>&rarr; w, h</em></div><div class="desc">Screen size in pixels.</div></div>
+<div class="entry"><div class="sig"><b>render.world_to_screen</b>( <i>x, y, z</i> ) <em>&rarr; {x,y} | nil</em></div><div class="desc"><code>nil</code> when the point is off-screen.</div></div>
+<div class="entry"><div class="sig"><b>render.text</b>( <i>x, y, r, g, b, a, str</i> ) <em>&middot;</em> <b>render.measure_text</b>( <i>str</i> )</div><div class="desc">Uses the default menu font. For any other font see <a data-p='fonts' style='color:var(--accent)'>fonts</a>.</div></div>
+<div class="entry"><div class="sig"><b>render.box3d</b>( <i>x, y, z, pitch, yaw, roll, mins, maxs, r, g, b, a, duration</i> )</div><div class="desc">3D box that stays for <code>duration</code> seconds. Call it <strong>once</strong>, not every frame.</div></div>
+<div class="entry"><div class="sig"><b>render.capsule3d</b>( <i>ax, ay, az, bx, by, bz, radius, r, g, b, a, duration</i> )</div><div class="desc">Same, capsule between two points.</div></div>
+
   </div>
 
-  <!-- ===================== fonts ===================== -->
   <div class="page" id="p-fonts">
     <p class="kicker">rendering</p>
     <h1>fonts</h1>
-    <pre><span class="k">local</span> <span class="v">f</span> = <span class="f">render.create_font</span>( <span class="s">"Verdana"</span>, <span class="n">14</span>, <span class="n">500</span> )
+    <div class="entry"><div class="sig"><b>render.create_font</b>( <i>name</i>, <i>size</i>, <em>[weight]</em>, <em>[flags]</em>, <em>[width]</em>, <em>[aa]</em> )</div><div class="desc">Makes a font. It&rsquo;s freed when your script unloads.</div></div>
+<div class="entry"><div class="sig"><b>font:get_size</b>( <i>str</i> ) <em>&rarr; w, h</em></div><div class="desc">Measure text in this font.</div></div>
+<div class="entry"><div class="sig"><b>font:text</b>( <i>x, y, r, g, b, a, str</i> ) <em>&middot;</em> <b>font:text_centered</b>( &hellip; )</div><div class="desc">Draw text.</div></div>
+<div class="entry"><div class="sig"><b>font:text_glow</b>( <i>x, y, r, g, b, a, gr, gg, gb, ga, str</i> )</div><div class="desc">Text with a glow behind it.</div></div>
+<div class="entry"><div class="sig"><b>render.fonts.menu</b> <em>&middot;</em> <b>menu_bold</b> <em>&middot;</em> <b>menu_tab</b></div><div class="desc">The menu&rsquo;s fonts, ready to use.</div></div>
+<pre><span class="k">local</span> f = <span class="f">render.create_font</span>( <span class="s">&quot;Verdana&quot;</span>, <span class="n">14</span>, <span class="n">500</span>,
+    <span class="f">bit.bor</span>( enums.font_flags.antialias, enums.font_flags.outline ),
+    <span class="n">0</span>, enums.font_aa.cleartype )
 
-<span class="k">local</span> <span class="v">w</span>, <span class="v">h</span> = <span class="v">f</span>:<span class="f">get_size</span>( <span class="s">"hello"</span> )
-<span class="v">f</span>:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">"hello"</span> )</pre>
-    <div class="entry"><div class="sig"><b>render.create_font</b>( <i>name</i>, <i>size</i>, <em>[weight]</em>, <em>[flags]</em>, <em>[width]</em>, <em>[aa]</em> )</div>
-      <div class="desc">Makes a font. It's freed when your script unloads.</div></div>
-    <div class="entry"><div class="sig"><b>font:get_size</b>( <i>str</i> ) <em>→ w, h</em></div><div class="desc">Measure text in this font.</div></div>
-    <div class="entry"><div class="sig"><b>font:text</b>( <i>x, y, r, g, b, a, str</i> ) <em>·</em> <b>font:text_centered</b>( … )</div><div class="desc">Draw text.</div></div>
-    <div class="entry"><div class="sig"><b>font:text_glow</b>( <i>x, y, r, g, b, a, gr, gg, gb, ga, str</i> )</div><div class="desc">Text with a glow behind it.</div></div>
-    <div class="entry"><div class="sig"><b>render.fonts.menu</b> <em>·</em> <b>menu_bold</b> <em>·</em> <b>menu_tab</b></div><div class="desc">The menu's fonts, ready to use.</div></div>
-    <div class="tw"><table>
-      <thead><tr><th>flags</th><th>values</th></tr></thead>
-      <tbody>
-        <tr><td><code>font_flags</code></td><td><code>none</code> · <code>antialias</code> · <code>dropshadow</code> · <code>outline</code></td></tr>
-        <tr><td><code>font_aa</code></td><td><code>default</code> · <code>none</code> · <code>standard</code> · <code>cleartype</code></td></tr>
-      </tbody>
-    </table></div>
-    <div class="note">Use <code>font_aa.none</code> for pixel/raster fonts — anti-aliasing makes them blurry.</div>
+<span class="k">local</span> w, h = f:<span class="f">get_size</span>( <span class="s">&quot;hello&quot;</span> )
+f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span>, <span class="s">&quot;hello&quot;</span> )</pre><div class="note ">Use <code>enums.font_aa.none</code> for pixel fonts &mdash; anti-aliasing makes them blurry.</div>
   </div>
 
-  <!-- ===================== entity ===================== -->
   <div class="page" id="p-entity">
     <p class="kicker">entities</p>
     <h1>entity</h1>
-    <pre><span class="k">local</span> <span class="v">me</span> = <span class="f">entity.get_local_player</span>( )
-<span class="k">if</span> <span class="v">me</span> <span class="k">then</span>
-    <span class="f">print</span>( <span class="v">me</span>:<span class="f">get_health</span>( ) )
-<span class="k">end</span>
+    <div class="entry"><div class="sig"><b>entity.get_local_player</b>( ) <em>&rarr; entity | nil</em></div><div class="desc">You.</div></div>
+<div class="entry"><div class="sig"><b>entity.get</b>( <i>index</i> ) <em>&rarr; entity | nil</em></div><div class="desc">By entity index.</div></div>
+<div class="entry"><div class="sig"><b>entity.get_players</b>( <em>[enemies_only]</em> ) <em>&rarr; array</em></div><div class="desc">Alive players.</div></div>
+<div class="entry"><div class="sig"><b>e:get_name</b>( <em>[max_len]</em> )</div><div class="desc">The player&rsquo;s name. Pass a length to cap it &mdash; anything longer is cut and gets <code>..</code> appended, so an ESP column stays a predictable width.</div></div>
+<div class="entry"><div class="sig"><b>e:get_health</b>( ) <em>&middot;</em> <b>e:get_team</b>( ) <em>&middot;</em> <b>e:is_alive</b>( ) <em>&middot;</em> <b>e:is_enemy</b>( )</div><div class="desc">Player state.</div></div>
+<div class="entry"><div class="sig"><b>e:is_player</b>( ) <em>&middot;</em> <b>e:is_dormant</b>( ) <em>&middot;</em> <b>e:index</b>( ) <em>&middot;</em> <b>e:valid</b>( )</div><div class="desc">Identity checks.</div></div>
+<div class="entry"><div class="sig"><b>e:get_origin</b>( ) <em>&rarr; {x,y,z}</em></div><div class="desc">World position.</div></div>
+<div class="entry"><div class="sig"><b>e:get_weapon</b>( ) <em>&rarr; weapon | nil</em></div><div class="desc">Their current weapon.</div></div>
+<pre><span class="k">for</span> _, p <span class="k">in</span> <span class="f">ipairs</span>( <span class="f">entity.get_players</span>( <span class="k">true</span> ) ) <span class="k">do</span>
+    <span class="k">if</span> <span class="k">not</span> p:<span class="f">is_dormant</span>( ) <span class="k">then</span>
+        <span class="k">local</span> o = p:<span class="f">get_origin</span>( )
+        <span class="k">local</span> s = <span class="f">render.world_to_screen</span>( o[<span class="n">1</span>], o[<span class="n">2</span>], o[<span class="n">3</span>] )
 
-<span class="k">for</span> <span class="v">_</span>, <span class="v">p</span> <span class="k">in</span> <span class="f">ipairs</span>( <span class="f">entity.get_players</span>( <span class="k">true</span> ) ) <span class="k">do</span>
-    <span class="f">print</span>( <span class="v">p</span>:<span class="f">get_health</span>( ) )
-<span class="k">end</span></pre>
-    <div class="entry"><div class="sig"><b>entity.get_local_player</b>( ) <em>→ entity | nil</em></div><div class="desc">You.</div></div>
-    <div class="entry"><div class="sig"><b>entity.get</b>( <i>index</i> ) <em>→ entity | nil</em></div><div class="desc">By entity index.</div></div>
-    <div class="entry"><div class="sig"><b>entity.get_players</b>( <em>[enemies_only]</em> ) <em>→ array</em></div><div class="desc">Alive players.</div></div>
-    <div class="entry"><div class="sig"><b>e:get_health</b>( ) <em>·</em> <b>e:get_team</b>( ) <em>·</em> <b>e:is_alive</b>( ) <em>·</em> <b>e:is_enemy</b>( )</div><div class="desc">Player state.</div></div>
-    <div class="entry"><div class="sig"><b>e:is_player</b>( ) <em>·</em> <b>e:is_dormant</b>( ) <em>·</em> <b>e:index</b>( ) <em>·</em> <b>e:valid</b>( )</div><div class="desc">Identity checks.</div></div>
-    <div class="entry"><div class="sig"><b>e:get_origin</b>( ) <em>→ {x,y,z}</em></div><div class="desc">World position.</div></div>
-    <div class="entry"><div class="sig"><b>e:get_weapon</b>( ) <em>→ weapon | nil</em></div><div class="desc">Their current weapon.</div></div>
-    <div class="note">If an entity stops existing, its functions return <code>nil</code> instead of crashing. You don't need to re-fetch it every frame, but it's cheap if you do.</div>
+        <span class="k">if</span> s <span class="k">then</span>
+            <span class="f">render.text</span>( s[<span class="n">1</span>], s[<span class="n">2</span>], <span class="n">255</span>, <span class="n">255</span>, <span class="n">255</span>, <span class="n">255</span>,
+                p:<span class="f">get_name</span>( <span class="n">10</span> ) )
+        <span class="k">end</span>
+    <span class="k">end</span>
+<span class="k">end</span></pre><div class="note ">If an entity stops existing, its functions return <code>nil</code> instead of crashing.</div>
   </div>
 
-  <!-- ===================== netprops ===================== -->
   <div class="page" id="p-netprops">
     <p class="kicker">entities</p>
     <h1>netprops</h1>
     <div class="intro"><p>Read and write networked properties by name.</p></div>
-    <pre><span class="k">local</span> <span class="v">flash</span> = <span class="v">me</span>:<span class="f">get_prop</span>( <span class="s">"m_flFlashDuration"</span> )
-<span class="k">local</span> <span class="v">off</span>   = <span class="f">entity.get_offset</span>( <span class="s">"DT_BasePlayer"</span>, <span class="s">"m_vecOrigin"</span> )</pre>
-    <div class="entry"><div class="sig"><b>e:get_prop</b>( <i>name</i> )</div>
-      <div class="desc">Returns the value, or <code>nil</code> if that prop doesn't exist on this entity.</div></div>
-    <div class="entry"><div class="sig"><b>e:set_prop</b>( <i>name</i>, <i>value</i> ) <span class="pill warn">restricted</span></div>
-      <div class="desc">Returns <code>true</code> on success. Some props are blocked — see below.</div></div>
-    <div class="entry"><div class="sig"><b>e:get_prop_address</b>( <i>name</i> ) <em>·</em> <b>e:address</b>( )</div>
-      <div class="desc">Memory address, for use with <a data-p="ffi" style="color:var(--accent)">ffi</a>.</div></div>
-    <div class="entry"><div class="sig"><b>entity.get_offset</b>( <i>table</i>, <i>prop</i> ) <em>→ number | nil</em></div>
-      <div class="desc">Offset without needing an entity.</div></div>
-    <div class="tw"><table>
-      <thead><tr><th>set_prop blocks</th><th>reason</th></tr></thead>
-      <tbody>
-        <tr><td>other players</td><td>The server overwrites it immediately, and it confuses the cheat's own tracking.</td></tr>
-        <tr><td>animation props</td><td>The cheat manages these itself.</td></tr>
-        <tr><td>predicted props</td><td>They get reset every prediction, so the write wouldn't stick.</td></tr>
-      </tbody>
-    </table></div>
-    <div class="note">A blocked write prints the reason to console, so you'll know why nothing happened. Use ffi if you need to do it anyway.</div>
+    <div class="entry"><div class="sig"><b>e:get_prop</b>( <i>name</i> )</div><div class="desc">Returns the value, or <code>nil</code> if that prop doesn&rsquo;t exist on this entity.</div></div>
+<div class="entry"><div class="sig"><b>e:set_prop</b>( <i>name</i>, <i>value</i> )<span class="pill warn">restricted</span></div><div class="desc">Returns <code>true</code> on success. Some props are blocked &mdash; see below.</div></div>
+<div class="entry"><div class="sig"><b>e:get_prop_address</b>( <i>name</i> ) <em>&middot;</em> <b>e:address</b>( )</div><div class="desc">Memory address, for use with <a data-p='ffi' style='color:var(--accent)'>ffi</a>.</div></div>
+<div class="entry"><div class="sig"><b>entity.get_offset</b>( <i>table</i>, <i>prop</i> ) <em>&rarr; number | nil</em></div><div class="desc">Offset without needing an entity.</div></div>
+<div class="tw"><table><thead><tr><th>set_prop blocks</th><th>reason</th></tr></thead><tbody><tr><td>other players</td><td>The server overwrites it immediately, and it confuses the cheat&rsquo;s own tracking.</td></tr><tr><td>animation props</td><td>The cheat manages these itself.</td></tr><tr><td>predicted props</td><td>They get reset every prediction, so the write wouldn&rsquo;t stick.</td></tr></tbody></table></div><div class="note ">A blocked write prints the reason to console, so you&rsquo;ll know why nothing happened. Use ffi if you need to do it anyway.</div>
   </div>
 
-  <!-- ===================== weapon ===================== -->
   <div class="page" id="p-weapon">
     <p class="kicker">entities</p>
     <h1>weapon</h1>
-    <pre><span class="k">local</span> <span class="v">w</span> = <span class="v">me</span>:<span class="f">get_weapon</span>( )
-<span class="k">if</span> <span class="v">w</span> <span class="k">then</span>
-    <span class="f">print</span>( <span class="v">w</span>:<span class="f">get_ammo</span>( ), <span class="v">w</span>:<span class="f">get_inaccuracy</span>( ) )
-<span class="k">end</span></pre>
-    <div class="entry"><div class="sig"><b>w:get_ammo</b>( ) <em>·</em> <b>w:get_item_index</b>( ) <em>·</em> <b>w:get_next_attack</b>( )</div><div class="desc">Clip, weapon id, next attack time.</div></div>
-    <div class="entry"><div class="sig"><b>w:get_mode</b>( ) <em>·</em> <b>w:is_shootable</b>( )</div><div class="desc">Scoped/burst mode, and whether it fires bullets.</div></div>
-    <div class="entry"><div class="sig"><b>w:get_max_speed</b>( ) <em>·</em> <b>w:get_cycletime</b>( )</div><div class="desc">Move speed with this weapon, and time between shots.</div></div>
-    <div class="entry"><div class="sig"><b>w:get_inaccuracy</b>( ) <em>·</em> <b>w:get_spread</b>( )</div>
-      <div class="desc">Current accuracy. Only for your own weapon — returns <code>nil</code> for anyone else's.</div></div>
-    <div class="entry"><div class="sig"><b>w:get_wpn_data</b>( ) <em>→ table</em></div>
-      <div class="desc">All the weapon's stats. See <a data-p="wpndata" style="color:var(--accent)">weapon data</a>.</div></div>
+    <div class="entry"><div class="sig"><b>w:get_ammo</b>( ) <em>&middot;</em> <b>w:get_item_index</b>( ) <em>&middot;</em> <b>w:get_next_attack</b>( )</div><div class="desc">Clip, weapon id, next attack time.</div></div>
+<div class="entry"><div class="sig"><b>w:get_mode</b>( ) <em>&middot;</em> <b>w:is_shootable</b>( )</div><div class="desc">Scoped/burst mode, and whether it fires bullets.</div></div>
+<div class="entry"><div class="sig"><b>w:get_max_speed</b>( ) <em>&middot;</em> <b>w:get_cycletime</b>( )</div><div class="desc">Move speed with this weapon, and time between shots.</div></div>
+<div class="entry"><div class="sig"><b>w:get_inaccuracy</b>( ) <em>&middot;</em> <b>w:get_spread</b>( )</div><div class="desc">Current accuracy. Only for your own weapon &mdash; returns <code>nil</code> for anyone else&rsquo;s.</div></div>
+<div class="entry"><div class="sig"><b>w:get_wpn_data</b>( ) <em>&rarr; table</em></div><div class="desc">All the weapon&rsquo;s stats. See <a data-p='wpndata' style='color:var(--accent)'>weapon data</a>.</div></div>
+
   </div>
 
-  <!-- ===================== wpndata ===================== -->
   <div class="page" id="p-wpndata">
     <p class="kicker">entities</p>
     <h1>weapon data</h1>
     <div class="intro"><p><code>w:get_wpn_data()</code> returns a table of everything the game knows about that weapon. These never change, so read once and keep it.</p></div>
-    <pre><span class="k">local</span> <span class="v">d</span> = <span class="v">w</span>:<span class="f">get_wpn_data</span>( )
-<span class="f">print</span>( <span class="v">d</span>.<span class="v">name</span>, <span class="v">d</span>.<span class="v">damage</span>, <span class="v">d</span>.<span class="v">cycletime</span> )</pre>
-    <div class="tw"><table>
-      <thead><tr><th>group</th><th>fields</th></tr></thead>
-      <tbody>
-        <tr><td>timing</td><td><code>cycletime</code>, <code>cycletime_alt</code>, <code>time_to_idle</code></td></tr>
-        <tr><td>damage</td><td><code>damage</code>, <code>armor_ratio</code>, <code>bullets</code>, <code>penetration</code>, <code>range</code>, <code>range_modifier</code></td></tr>
-        <tr><td>accuracy</td><td><code>spread</code>, <code>inaccuracy_stand</code>, <code>_crouch</code>, <code>_move</code>, <code>_jump</code>, <code>_jump_initial</code>, <code>_land</code>, <code>_ladder</code>, <code>_fire</code>, <code>_reload</code></td></tr>
-        <tr><td>recovery</td><td><code>recovery_time_stand</code>, <code>_crouch</code>, their <code>_final</code>, <code>recovery_transition_start_bullet</code>, <code>_end_bullet</code></td></tr>
-        <tr><td>recoil</td><td><code>recoil_angle</code>, <code>recoil_magnitude</code>, their variances, <code>recoil_seed</code></td></tr>
-        <tr><td>info</td><td><code>name</code>, <code>type</code>, <code>price</code>, <code>full_auto</code>, <code>has_silencer</code>, <code>max_clip</code>, <code>max_reserve</code>, <code>max_player_speed</code></td></tr>
-      </tbody>
-    </table></div>
-    <div class="note"><strong>Most fields have an <code>_alt</code> version</strong> — that's the value when the weapon is scoped, silenced or in burst mode. Use <code>w:get_mode()</code> to know which applies.</div>
-    <div class="note warn"><code>cycletime</code> is how fast the weapon shoots. <code>recovery_time_*</code> is how fast accuracy comes back after shooting. Different things.</div>
+    <div class="tw"><table><thead><tr><th>group</th><th>fields</th></tr></thead><tbody><tr><td>timing</td><td><code>cycletime</code>, <code>cycletime_alt</code>, <code>time_to_idle</code></td></tr><tr><td>damage</td><td><code>damage</code>, <code>armor_ratio</code>, <code>bullets</code>, <code>penetration</code>, <code>range</code>, <code>range_modifier</code></td></tr><tr><td>accuracy</td><td><code>spread</code>, <code>inaccuracy_stand</code>, <code>_crouch</code>, <code>_move</code>, <code>_jump</code>, <code>_jump_initial</code>, <code>_land</code>, <code>_ladder</code>, <code>_fire</code>, <code>_reload</code></td></tr><tr><td>recovery</td><td><code>recovery_time_stand</code>, <code>_crouch</code>, their <code>_final</code>, <code>recovery_transition_start_bullet</code>, <code>_end_bullet</code></td></tr><tr><td>recoil</td><td><code>recoil_angle</code>, <code>recoil_magnitude</code>, their variances, <code>recoil_seed</code></td></tr><tr><td>info</td><td><code>name</code>, <code>type</code>, <code>price</code>, <code>full_auto</code>, <code>has_silencer</code>, <code>max_clip</code>, <code>max_reserve</code>, <code>max_player_speed</code></td></tr></tbody></table></div><div class="note "><strong>Most fields have an <code>_alt</code> version</strong> &mdash; that&rsquo;s the value when the weapon is scoped, silenced or in burst mode. Use <code>w:get_mode()</code> to know which applies.</div><div class="note warn"><code>cycletime</code> is how fast the weapon shoots. <code>recovery_time_*</code> is how fast accuracy comes back after shooting. Different things.</div>
   </div>
 
-  <!-- ===================== cmd ===================== -->
-  <div class="page" id="p-cmd">
-    <p class="kicker">objects</p>
-    <h1>cmd</h1>
-    <div class="intro"><p>The move commands hand you a <code>cmd</code>. It's how you change what gets sent to the server.</p></div>
-    <pre><span class="f">callbacks.add</span>( <span class="s">"pre_move"</span>, <span class="k">function</span>( <span class="v">cmd</span> )
-    <span class="v">cmd</span>:<span class="f">set_forwardmove</span>( <span class="n">250</span> )
-    <span class="v">cmd</span>:<span class="f">strip_button</span>( <span class="v">buttons</span>.<span class="v">IN_JUMP</span> )
-<span class="k">end</span> )</pre>
-    <div class="entry"><div class="sig"><b>cmd:get_yaw</b>( ) <em>·</em> <b>cmd:set_yaw</b>( <i>v</i> )</div><div class="desc">Also <code>pitch</code> and <code>roll</code>.</div></div>
-    <div class="entry"><div class="sig"><b>cmd:get_forwardmove</b>( ) <em>·</em> <b>cmd:set_forwardmove</b>( <i>v</i> )</div><div class="desc">Also <code>sidemove</code> and <code>upmove</code>.</div></div>
-    <div class="entry"><div class="sig"><b>cmd:get_send_packet</b>( ) <em>·</em> <b>cmd:set_send_packet</b>( <i>bool</i> )</div><div class="desc">Whether this tick is sent to the server.</div></div>
-    <div class="entry"><div class="sig"><b>cmd:get_weaponselect</b>( ) <em>·</em> <b>cmd:set_weaponselect</b>( <i>v</i> )</div><div class="desc">Weapon switch.</div></div>
-    <div class="entry"><div class="sig"><b>cmd:add_button</b>( <i>bit</i> ) <em>·</em> <b>cmd:strip_button</b>( <i>bit</i> ) <em>·</em> <b>cmd:has_button</b>( <i>bit</i> )</div>
-      <div class="desc">Add, remove, or test a button. See <a data-p="buttons" style="color:var(--accent)">buttons</a>.</div></div>
-    <div class="entry"><div class="sig"><b>cmd:get_buttons</b>( ) <em>·</em> <b>cmd:get_command_number</b>( ) <em>·</em> <b>cmd:get_tick</b>( ) <em>·</em> <b>cmd:get_random_seed</b>( ) <span class="pill">read only</span></div>
-      <div class="desc">Changing these would desync you from the server.</div></div>
-    <div class="note warn"><strong><code>IN_ATTACK</code> is handled by the cheat.</strong> You can't remove it — the aimbot already decided. You can add it, but only when <code>client.can_fire()</code> is true. Both calls return <code>false</code> if the attack bit was ignored.</div>
-    <div class="note"><strong>Only use <code>cmd</code> inside the callback that gave it to you.</strong> Don't save it in a variable for later.</div>
-  </div>
-
-  <!-- ===================== globals ===================== -->
   <div class="page" id="p-globals">
     <p class="kicker">misc</p>
     <h1>globals</h1>
-    <div class="entry"><div class="sig"><b>globals.curtime</b>( ) <em>·</em> <b>realtime</b>( )</div><div class="desc">Server-synced time, and local time.</div></div>
-    <div class="entry"><div class="sig"><b>globals.frametime</b>( ) <em>·</em> <b>absoluteframetime</b>( )</div><div class="desc">Seconds since the last frame.</div></div>
-    <div class="entry"><div class="sig"><b>globals.tickcount</b>( ) <em>·</em> <b>tickinterval</b>( )</div><div class="desc">Server tick, and seconds per tick.</div></div>
-    <div class="entry"><div class="sig"><b>globals.framecount</b>( ) <em>·</em> <b>maxplayers</b>( )</div><div class="desc">Frames since launch, and server slot count.</div></div>
+    <div class="entry"><div class="sig"><b>globals.curtime</b>( ) <em>&middot;</em> <b>realtime</b>( )</div><div class="desc">Server-synced time, and local time.</div></div>
+<div class="entry"><div class="sig"><b>globals.frametime</b>( ) <em>&middot;</em> <b>absoluteframetime</b>( )</div><div class="desc">Seconds since the last frame.</div></div>
+<div class="entry"><div class="sig"><b>globals.tickcount</b>( ) <em>&middot;</em> <b>tickinterval</b>( )</div><div class="desc">Server tick, and seconds per tick.</div></div>
+<div class="entry"><div class="sig"><b>globals.framecount</b>( ) <em>&middot;</em> <b>maxplayers</b>( )</div><div class="desc">Frames since launch, and server slot count.</div></div>
+
   </div>
 
-  <!-- ===================== client ===================== -->
   <div class="page" id="p-client">
     <p class="kicker">misc</p>
     <h1>client</h1>
-    <div class="entry"><div class="sig"><b>client.log</b>( <i>…</i> ) <em>·</em> <b>print</b>( <i>…</i> )</div><div class="desc">Print to console. Takes any values.</div></div>
-    <div class="entry"><div class="sig"><b>client.color_log</b>( <i>r, g, b, …</i> )</div><div class="desc">Same, in colour.</div></div>
-    <div class="entry"><div class="sig"><b>client.key_state</b>( <i>vk</i> )</div><div class="desc">Is a key held down.</div></div>
-    <div class="entry"><div class="sig"><b>client.can_fire</b>( )</div>
-      <div class="desc">Whether a shot is possible this tick. Predicted, so read it in <code>in_move</code> for the current value.</div></div>
+    <div class="entry"><div class="sig"><b>client.log</b>( <i>&hellip;</i> ) <em>&middot;</em> <b>print</b>( <i>&hellip;</i> )</div><div class="desc">Print to console. Takes any values.</div></div>
+<div class="entry"><div class="sig"><b>client.color_log</b>( <i>r, g, b, &hellip;</i> )</div><div class="desc">Same, in colour.</div></div>
+<div class="entry"><div class="sig"><b>client.key_state</b>( <i>vk</i> )</div><div class="desc">Is a key held down.</div></div>
+<div class="entry"><div class="sig"><b>client.can_fire</b>( )</div><div class="desc">Whether a shot is possible this tick. Predicted, so read it in <code>in_move</code> for the current value.</div></div>
+
   </div>
 
-  <!-- ===================== buttons ===================== -->
-  <div class="page" id="p-buttons">
+  <div class="page" id="p-enums">
     <p class="kicker">misc</p>
-    <h1>buttons</h1>
-    <div class="intro"><p>Named the same as in the game, e.g. <code>buttons.IN_JUMP</code>.</p></div>
-    <pre>IN_ATTACK    IN_JUMP      IN_DUCK       IN_FORWARD
-IN_BACK      IN_USE       IN_CANCEL     IN_LEFT
-IN_RIGHT     IN_MOVELEFT  IN_MOVERIGHT  IN_ATTACK2
-IN_RUN       IN_RELOAD    IN_ALT1       IN_ALT2
-IN_SCORE     IN_SPEED     IN_WALK       IN_ZOOM
-IN_WEAPON1   IN_WEAPON2   IN_BULLRUSH   IN_GRENADE1
-IN_GRENADE2  IN_ATTACK3</pre>
-    <pre><span class="c">-- combine with bit.bor</span>
-<span class="v">cmd</span>:<span class="f">strip_button</span>( bit.<span class="f">bor</span>( <span class="v">buttons</span>.<span class="v">IN_LEFT</span>, <span class="v">buttons</span>.<span class="v">IN_RIGHT</span> ) )</pre>
+    <h1>enums</h1>
+    <div class="intro"><p>Lookup tables mirroring the game&rsquo;s own enums.</p></div>
+    <div class="entry"><div class="sig"><b>enums.buttons</b></div><div class="desc">All 26 <code>IN_*</code> constants, named the same as in the game.</div></div>
+<div class="entry"><div class="sig"><b>enums.hitgroup</b>[ <i>id</i> ]</div><div class="desc"><code>generic</code>, <code>head</code>, <code>chest</code>, <code>stomach</code>, <code>left arm</code>, <code>right arm</code>, <code>left leg</code>, <code>right leg</code>, <code>neck</code>, <code>gear</code>.</div></div>
+<div class="entry"><div class="sig"><b>enums.hitbox</b>[ <i>id</i> ]</div><div class="desc">All 20 hitboxes &mdash; <code>head</code>, <code>neck</code>, <code>pelvis</code>, <code>thorax</code>, <code>chest</code>, the limbs&hellip;</div></div>
+<div class="entry"><div class="sig"><b>enums.hitbox_id</b>[ <i>name</i> ]</div><div class="desc">The reverse &mdash; name to number.</div></div>
+<div class="entry"><div class="sig"><b>enums.font_flags</b> <em>&middot;</em> <b>enums.font_aa</b></div><div class="desc">Font creation flags and smoothing modes.</div></div>
+<pre>cmd:<span class="f">strip_button</span>( enums.buttons.IN_JUMP )
+
+<span class="f">print</span>( enums.hitgroup[ <span class="n">1</span> ] )          <span class="c">--&gt; head</span>
+<span class="f">print</span>( enums.hitbox[ <span class="n">6</span> ] )            <span class="c">--&gt; chest</span>
+<span class="f">print</span>( enums.hitbox_id[ <span class="s">&quot;pelvis&quot;</span> ] )  <span class="c">--&gt; 3</span></pre><div class="note "><strong>These are keyed by the raw value, not 1-based.</strong> An id straight out of <code>get_int("hitgroup")</code> or a shot event indexes them directly, no <code>+1</code>.</div><div class="note "><code>enums.hitgroup</code> is sparse &mdash; there&rsquo;s no <code>9</code>, and <code>gear</code> is <code>10</code>. Use <code>or "?"</code> when formatting.</div>
   </div>
 
-  <!-- ===================== ffi ===================== -->
   <div class="page" id="p-ffi">
     <p class="kicker">misc</p>
     <h1>ffi</h1>
     <div class="intro"><p>Direct memory access. Turn on <strong>allow unsafe scripts</strong> in the scripts tab first.</p></div>
-    <pre><span class="k">local</span> <span class="v">ffi</span> = <span class="f">require</span>( <span class="s">"ffi"</span> )
+    <pre><span class="k">local</span> ffi = <span class="f">require</span>( <span class="s">&quot;ffi&quot;</span> )
 
-<span class="k">local</span> <span class="v">addr</span> = <span class="v">me</span>:<span class="f">get_prop_address</span>( <span class="s">"m_flFlashDuration"</span> )
-<span class="v">ffi</span>.<span class="f">cast</span>( <span class="s">"float*"</span>, <span class="v">addr</span> )[ <span class="n">0</span> ] = <span class="n">0</span></pre>
-    <div class="note bad"><strong>ffi can do anything the cheat can</strong>, including crash the game. Only turn it on for scripts you trust. It also bypasses every restriction listed elsewhere in these docs.</div>
-    <div class="note"><code>get_prop_address</code> and <code>entity.get_offset</code> exist so you don't have to look offsets up yourself, and so they keep working after a game update. Hardcode one if you'd rather, or if the prop isn't something they can resolve.</div>
+<span class="k">local</span> addr = me:<span class="f">get_prop_address</span>( <span class="s">&quot;m_flFlashDuration&quot;</span> )
+<span class="f">ffi.cast</span>( <span class="s">&quot;float*&quot;</span>, addr )[ <span class="n">0</span> ] = <span class="n">0</span></pre><div class="note bad"><strong>ffi can do anything the cheat can</strong>, including crash the game. Only turn it on for scripts you trust. It also bypasses every restriction listed elsewhere in these docs.</div><div class="note "><code>get_prop_address</code> and <code>entity.get_offset</code> are there so you don&rsquo;t have to look offsets up yourself, and so they keep working after a game update. Hardcode one if you&rsquo;d rather, or if the prop isn&rsquo;t something they can resolve.</div>
   </div>
 
-  <!-- ===================== gotchas ===================== -->
   <div class="page" id="p-gotchas">
     <p class="kicker">reference</p>
     <h1>gotchas</h1>
-    <div class="entry"><div class="sig"><b>predicted values depend on when you read them</b></div>
-      <div class="desc"><code>get_inaccuracy</code>, <code>get_spread</code>, <code>get_mode</code> and <code>can_fire</code> are predicted. In <code>pre_move</code> they're a tick behind; in <code>in_move</code> they're current.</div></div>
-    <div class="entry"><div class="sig"><b>one set_callback per control</b></div>
-      <div class="desc">Calling <code>ui.set_callback</code> twice on the same handle replaces the first one.</div></div>
-    <div class="entry"><div class="sig"><b>drawing only works in paint</b></div>
-      <div class="desc">Except <code>box3d</code> and <code>capsule3d</code>, which you call once with a duration.</div></div>
-    <div class="entry"><div class="sig"><b>errors unload your script</b></div>
-      <div class="desc">The error prints to console. This stops a broken script spamming every frame.</div></div>
-    <div class="entry"><div class="sig"><b>column 0 vs column 1</b></div>
-      <div class="desc">Without a subtab, column 0 is taken by the script list — use column 1. With a subtab, both are yours.</div></div>
-    <div class="entry"><div class="sig"><b>old handles are safe</b></div>
-      <div class="desc">A handle to something that no longer exists returns <code>nil</code>. It won't crash.</div></div>
+    <div class="entry"><div class="sig"><b>predicted values depend on when you read them</b></div><div class="desc"><code>get_inaccuracy</code>, <code>get_spread</code>, <code>get_mode</code> and <code>can_fire</code> are predicted. In <code>pre_move</code> they&rsquo;re a tick behind; in <code>in_move</code> they&rsquo;re current.</div></div>
+<div class="entry"><div class="sig"><b>objects only live inside their callback</b></div><div class="desc"><code>cmd</code>, <code>shot</code>, the esp context and game events all stop working once the callback returns. Copy out what you need.</div></div>
+<div class="entry"><div class="sig"><b>one set_callback per control</b></div><div class="desc">Calling <code>ui.set_callback</code> twice on the same handle replaces the first one.</div></div>
+<div class="entry"><div class="sig"><b>drawing only works in paint and player_esp</b></div><div class="desc">Except <code>box3d</code> and <code>capsule3d</code>, which you call once with a duration.</div></div>
+<div class="entry"><div class="sig"><b>errors unload your script</b></div><div class="desc">The error prints to console. This stops a broken script spamming every frame.</div></div>
+<div class="entry"><div class="sig"><b>column 0 vs column 1</b></div><div class="desc">Without a subtab, column 0 is taken by the script list &mdash; use column 1. With a subtab, both are yours.</div></div>
+<div class="entry"><div class="sig"><b>old handles are safe</b></div><div class="desc">A handle to something that no longer exists returns <code>nil</code>. It won&rsquo;t crash.</div></div>
+
   </div>
+
+  <div class="page" id="p-examples">
+    <p class="kicker">start</p>
+    <h1>examples</h1>
+    <div class="intro"><p>Complete scripts. Save any of these as a <code>.lua</code> file and load it.</p></div>
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">watermark with a toggle</p><pre><span class="k">local</span> on   = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;watermark&quot;</span>, <span class="k">true</span> )
+<span class="k">local</span> col  = <span class="f">ui.color_picker</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;colour&quot;</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span> )
+<span class="k">local</span> font = <span class="f">render.create_font</span>( <span class="s">&quot;Verdana&quot;</span>, <span class="n">14</span>, <span class="n">500</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
+    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( on ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> c    = <span class="f">ui.get</span>( col )
+    <span class="k">local</span> text = <span class="f">string.format</span>( <span class="s">&quot;soggybot | %d fps&quot;</span>,
+                    <span class="n">1</span> / <span class="f">math.max</span>( <span class="f">globals.frametime</span>( ), <span class="n">0.0001</span> ) )
+
+    <span class="k">local</span> tw, th = font:<span class="f">get_size</span>( text )
+    <span class="k">local</span> sw     = <span class="f">render.screen_size</span>( )
+    <span class="k">local</span> x, y   = sw - tw - <span class="n">14</span>, <span class="n">10</span>
+
+    <span class="f">render.rect_filled</span>( x - <span class="n">5</span>, y - <span class="n">3</span>, tw + <span class="n">10</span>, th + <span class="n">6</span>, <span class="n">0</span>, <span class="n">0</span>, <span class="n">0</span>, <span class="n">150</span> )
+    font:<span class="f">text</span>( x, y, c[<span class="n">1</span>], c[<span class="n">2</span>], c[<span class="n">3</span>], c[<span class="n">4</span>], text )
+<span class="k">end</span> )</pre><p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">hit / miss counter</p><pre><span class="k">local</span> hits, misses = <span class="n">0</span>, { }
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;aim_hit&quot;</span>, <span class="k">function</span>( )
+    hits = hits + <span class="n">1</span>
+<span class="k">end</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;aim_miss&quot;</span>, <span class="k">function</span>( s )
+    <span class="k">local</span> why = s:<span class="f">get_reason</span>( )
+    misses[ why ] = ( misses[ why ] <span class="k">or</span> <span class="n">0</span> ) + <span class="n">1</span>
+<span class="k">end</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;round_start&quot;</span>, <span class="k">function</span>( )
+    hits, misses = <span class="n">0</span>, { }
+<span class="k">end</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
+    <span class="k">local</span> y = <span class="n">300</span>
+    <span class="f">render.text</span>( <span class="n">12</span>, y, <span class="n">120</span>, <span class="n">220</span>, <span class="n">120</span>, <span class="n">255</span>, <span class="s">&quot;hits: &quot;</span> .. hits )
+
+    <span class="k">for</span> why, n <span class="k">in</span> <span class="f">pairs</span>( misses ) <span class="k">do</span>
+        y = y + <span class="n">14</span>
+        <span class="f">render.text</span>( <span class="n">12</span>, y, <span class="n">235</span>, <span class="n">80</span>, <span class="n">80</span>, <span class="n">255</span>, why .. <span class="s">&quot;: &quot;</span> .. n )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre><p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">esp flags</p><pre><span class="k">local</span> on = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;extra flags&quot;</span>, <span class="k">true</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;player_esp&quot;</span>, <span class="k">function</span>( ctx )
+    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( on ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> p = ctx:<span class="f">get_player</span>( )
+
+    <span class="k">if</span> p:<span class="f">get_prop</span>( <span class="s">&quot;m_bHasDefuser&quot;</span> ) == <span class="n">1</span> <span class="k">then</span>
+        ctx:<span class="f">add_flag</span>( <span class="s">&quot;kit&quot;</span>, <span class="n">120</span>, <span class="n">220</span>, <span class="n">120</span> )
+    <span class="k">end</span>
+
+    <span class="k">local</span> cash = p:<span class="f">get_prop</span>( <span class="s">&quot;m_iAccount&quot;</span> )
+    <span class="k">if</span> cash <span class="k">and</span> cash &gt;= <span class="n">4000</span> <span class="k">then</span>
+        ctx:<span class="f">add_flag</span>( <span class="s">&quot;rich&quot;</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span> )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre><p style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px">slowwalk on its own page</p><pre><span class="k">local</span> page  = <span class="f">ui.subtab</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;slowwalk&quot;</span> )
+<span class="k">local</span> key   = <span class="f">ui.hotkey</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;slowwalk key&quot;</span> )
+<span class="k">local</span> speed = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;speed&quot;</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
+
+<span class="f">ui.set_subtab</span>( key, page )
+<span class="f">ui.set_subtab</span>( speed, page )
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;pre_move&quot;</span>, <span class="k">function</span>( cmd )
+    <span class="k">if</span> <span class="k">not</span> <span class="f">ui.get</span>( key ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
+
+    <span class="k">local</span> want = <span class="f">ui.get</span>( speed )
+    <span class="k">local</span> f, s = cmd:<span class="f">get_forwardmove</span>( ), cmd:<span class="f">get_sidemove</span>( )
+    <span class="k">local</span> len  = <span class="f">math.sqrt</span>( f * f + s * s )
+
+    <span class="k">if</span> len &gt; want <span class="k">then</span>
+        cmd:<span class="f">set_forwardmove</span>( f / len * want )
+        cmd:<span class="f">set_sidemove</span>( s / len * want )
+    <span class="k">end</span>
+<span class="k">end</span> )</pre>
+  </div>
+
 </main>
 </div>
 
