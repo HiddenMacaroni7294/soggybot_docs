@@ -193,6 +193,49 @@ tbody tr:last-child td{border-bottom:0}
 
 mark{background:color-mix(in srgb,var(--accent-ink) 34%,transparent);color:inherit;border-radius:2px}
 
+/* ---------- changelog ---------- */
+.rel{margin:0 0 30px}
+.rel-h{display:flex;align-items:baseline;gap:12px;padding-bottom:9px;margin-bottom:13px;
+  border-bottom:1px solid var(--line)}
+.rel-h h2{margin:0;font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink)}
+.rel-d{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3)}
+.chg{display:flex;gap:12px;align-items:flex-start;padding:7px 0}
+.chg-k{flex:0 0 58px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:600;text-align:center;padding:2px 0;margin-top:3px;
+  border-radius:20px;border:1px solid var(--line);color:var(--ink-3)}
+.chg-k.added{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+.chg-k.fixed{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 40%,transparent)}
+.chg-k.changed{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.chg-k.removed{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)}
+.chg-t{flex:1;font-size:14px;color:var(--ink-2);min-width:0}
+.chg-t b{color:var(--ink);font-weight:600}
+
+/* ---------- bug report form ---------- */
+.bug{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:18px 18px 15px;margin:0 0 18px;box-shadow:var(--shadow)}
+.bug label{display:block;margin:0 0 14px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.bug textarea{display:block;width:100%;box-sizing:border-box;margin-top:7px;resize:vertical;
+  background:var(--code-bg);color:var(--ink);border:1px solid var(--code-line);border-radius:7px;
+  padding:9px 11px;font-family:var(--mono);font-size:12.5px;line-height:1.55;
+  letter-spacing:normal;text-transform:none;font-weight:400}
+.bug textarea:focus{outline:0;border-color:color-mix(in srgb,var(--accent) 55%,var(--code-line))}
+.bug textarea::placeholder{color:var(--ink-3);opacity:.65}
+.bug-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px}
+.bug-b{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;cursor:pointer;
+  padding:8px 15px;border-radius:7px;border:1px solid var(--line);
+  background:var(--accent);color:#15171F;font-weight:600}
+.bug-b:hover{filter:brightness(1.08)}
+.bug-b:disabled{opacity:.55;cursor:default;filter:none}
+.bug-b[hidden]{display:none}
+.bug-b.alt{background:var(--panel-2);color:var(--ink-2)}
+.bug-b.alt:hover{color:var(--ink);border-color:var(--ink-3);filter:none}
+.bug-msg{font-family:var(--mono);font-size:11.5px;color:var(--ok);opacity:0;
+  transition:opacity .15s}
+.bug-msg.on{opacity:1}
+.bug-msg.err{color:var(--bad)}
+
 /* search results view */
 #results{display:none}
 body.searching #results{display:block}
@@ -362,6 +405,8 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
       <button class="grp" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>reference</button>
       <div class="grpitems">
         <a href="#gotchas" data-p="gotchas">gotchas</a>
+        <a href="#changelog" data-p="changelog">changelog</a>
+        <a href="#report" data-p="report">report a bug</a>
       </div>
     </div>
   </nav>
@@ -376,7 +421,7 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
     <div class="intro"><p>Put <code>.lua</code> files in <code>Documents\&lt;user&gt;\scripts\</code> and load them from the <strong>scripts</strong> tab.</p><p>Every script runs in its own sandbox, so scripts can&rsquo;t break each other. If a script errors it gets unloaded and the error is printed to console.</p></div>
     
     <div class="note "><strong>Where things live.</strong> <code>ui</code> makes menu controls, <code>render</code> draws, <code>entity</code> reads the game, <code>callbacks</code> hooks events, <code>enums</code> holds the lookup tables. Anything unavailable comes back as <code>nil</code> rather than erroring.</div><pre><span class="c">-- a minimal script</span>
-<span class="k">local</span> enabled = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;my script&quot;</span>, <span class="k">true</span> )
+<span class="k">local</span> enabled = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;script options&quot;</span>, <span class="s">&quot;my script&quot;</span>, <span class="k">true</span> )
 
 <span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
     <span class="k">if</span> <span class="k">not</span> enabled:<span class="f">get</span>( ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
@@ -621,9 +666,9 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
     <p class="kicker">objects</p>
     <h1>vectors</h1>
     <div class="intro"><p>Positions, directions and view angles. Everything that hands you a point in the world hands you one of these.</p></div>
-    <div class="synopsis"><p class="syn-h">on this page</p><div class="chips"><a class="chip" href="#e-vec-1" data-e="e-vec-1">vec3</a><a class="chip" href="#e-vec-1" data-e="e-vec-1">vec2</a><a class="chip" href="#e-vec-1" data-e="e-vec-1">ang</a><a class="chip" href="#e-vec-2" data-e="e-vec-2">v.x</a><a class="chip" href="#e-vec-2" data-e="e-vec-2">v.y</a><a class="chip" href="#e-vec-2" data-e="e-vec-2">v.z</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v + w</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v - w</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v * 2</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v / 2</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">-v</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v == w</a><a class="chip" href="#e-vec-4" data-e="e-vec-4">v:length</a><a class="chip" href="#e-vec-4" data-e="e-vec-4">v:length_2d</a><a class="chip" href="#e-vec-4" data-e="e-vec-4">v:length_sqr</a><a class="chip" href="#e-vec-4" data-e="e-vec-4">v:length_2d_sqr</a><a class="chip" href="#e-vec-5" data-e="e-vec-5">v:dist_to</a><a class="chip" href="#e-vec-5" data-e="e-vec-5">v:dist_to_sqr</a><a class="chip" href="#e-vec-6" data-e="e-vec-6">v:dot</a><a class="chip" href="#e-vec-6" data-e="e-vec-6">v:cross</a><a class="chip" href="#e-vec-7" data-e="e-vec-7">v:normalize</a><a class="chip" href="#e-vec-7" data-e="e-vec-7">v:normalized</a><a class="chip" href="#e-vec-8" data-e="e-vec-8">a:get_pitch</a><a class="chip" href="#e-vec-8" data-e="e-vec-8">a:get_yaw</a><a class="chip" href="#e-vec-8" data-e="e-vec-8">a:get_roll</a><a class="chip" href="#e-vec-9" data-e="e-vec-9">a:forward</a><a class="chip" href="#e-vec-10" data-e="e-vec-10">a:normalize</a><a class="chip" href="#e-vec-10" data-e="e-vec-10">a:normalized</a><a class="chip" href="#e-vec-10" data-e="e-vec-10">a:clamp</a><a class="chip" href="#e-vec-11" data-e="e-vec-11">v:unpack</a><a class="chip" href="#e-vec-12" data-e="e-vec-12">v:clear</a></div></div>
+    <div class="synopsis"><p class="syn-h">on this page</p><div class="chips"><a class="chip" href="#e-vec-1" data-e="e-vec-1">vec3</a><a class="chip" href="#e-vec-1" data-e="e-vec-1">vec2</a><a class="chip" href="#e-vec-1" data-e="e-vec-1">ang</a><a class="chip" href="#e-vec-2" data-e="e-vec-2">v.x</a><a class="chip" href="#e-vec-2" data-e="e-vec-2">v.y</a><a class="chip" href="#e-vec-2" data-e="e-vec-2">v.z</a><a class="chip" href="#e-vec-2" data-e="e-vec-2">v:set</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v + w</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v - w</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v * 2</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v / 2</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">-v</a><a class="chip" href="#e-vec-3" data-e="e-vec-3">v == w</a><a class="chip" href="#e-vec-4" data-e="e-vec-4">v:length</a><a class="chip" href="#e-vec-4" data-e="e-vec-4">v:length_2d</a><a class="chip" href="#e-vec-4" data-e="e-vec-4">v:length_sqr</a><a class="chip" href="#e-vec-4" data-e="e-vec-4">v:length_2d_sqr</a><a class="chip" href="#e-vec-5" data-e="e-vec-5">v:dist_to</a><a class="chip" href="#e-vec-5" data-e="e-vec-5">v:dist_to_sqr</a><a class="chip" href="#e-vec-6" data-e="e-vec-6">v:dot</a><a class="chip" href="#e-vec-6" data-e="e-vec-6">v:cross</a><a class="chip" href="#e-vec-7" data-e="e-vec-7">v:normalize</a><a class="chip" href="#e-vec-7" data-e="e-vec-7">v:normalized</a><a class="chip" href="#e-vec-8" data-e="e-vec-8">a:get_pitch</a><a class="chip" href="#e-vec-8" data-e="e-vec-8">a:get_yaw</a><a class="chip" href="#e-vec-8" data-e="e-vec-8">a:get_roll</a><a class="chip" href="#e-vec-9" data-e="e-vec-9">a:forward</a><a class="chip" href="#e-vec-10" data-e="e-vec-10">a:normalize</a><a class="chip" href="#e-vec-10" data-e="e-vec-10">a:normalized</a><a class="chip" href="#e-vec-10" data-e="e-vec-10">a:clamp</a><a class="chip" href="#e-vec-11" data-e="e-vec-11">v:unpack</a><a class="chip" href="#e-vec-12" data-e="e-vec-12">v:clear</a></div></div>
     <div class="entry" id="e-vec-1"><div class="sig"><b>vec3</b>( <i>x</i>, <i>y</i>, <i>z</i> ) <em>&middot;</em> <b>vec2</b>( <i>x</i>, <i>y</i> ) <em>&middot;</em> <b>ang</b>( <i>pitch</i>, <i>yaw</i>, <i>roll</i> )</div><div class="desc">Make one. Arguments default to <code>0</code>.</div></div>
-<div class="entry" id="e-vec-2"><div class="sig"><b>v.x</b> <em>&middot;</em> <b>v.y</b> <em>&middot;</em> <b>v.z</b></div><div class="desc">Read and write the components directly.</div></div>
+<div class="entry" id="e-vec-2"><div class="sig"><b>v.x</b> <em>&middot;</em> <b>v.y</b> <em>&middot;</em> <b>v.z</b> <em>&middot;</em> <b>v:set</b>( <i>x, y, z</i> )</div><div class="desc">Read and write the components directly. <code>ang</code> also answers to <code>a.pitch</code> / <code>a.yaw</code> / <code>a.roll</code>.</div></div>
 <div class="entry" id="e-vec-3"><div class="sig"><b>v + w</b> <em>&middot;</em> <b>v - w</b> <em>&middot;</em> <b>v * 2</b> <em>&middot;</em> <b>v / 2</b> <em>&middot;</em> <b>-v</b> <em>&middot;</em> <b>v == w</b></div><div class="desc">All the operators work, against another vector or a plain number.</div></div>
 <h2 class="sec" id="s-vec3">vec3</h2><div class="entry" id="e-vec-4"><div class="sig"><b>v:length</b>( ) <em>&middot;</em> <b>v:length_2d</b>( ) <em>&middot;</em> <b>v:length_sqr</b>( ) <em>&middot;</em> <b>v:length_2d_sqr</b>( )</div><div class="desc"><code>_2d</code> ignores Z, which is what you want for speed. The <code>_sqr</code> forms skip a square root &mdash; use them when you&rsquo;re only comparing.</div></div>
 <div class="entry" id="e-vec-5"><div class="sig"><b>v:dist_to</b>( <i>other</i> ) <em>&middot;</em> <b>v:dist_to_sqr</b>( <i>other</i> )</div><div class="desc">Distance to another point.</div></div>
@@ -649,15 +694,16 @@ pre::-webkit-scrollbar-thumb{border:2px solid var(--code-bg)}
     <p class="kicker">objects</p>
     <h1>ui item</h1>
     <div class="intro"><p>What every <a href='#ui' data-p='ui' class='xref'>ui</a> constructor returns. A control that has been destroyed stays safe &mdash; its methods just do nothing.</p></div>
-    <div class="synopsis"><p class="syn-h">on this page</p><div class="chips"><a class="chip" href="#e-obj-uiitem-1" data-e="e-obj-uiitem-1">item:get</a><a class="chip" href="#e-obj-uiitem-2" data-e="e-obj-uiitem-2">item:set</a><a class="chip" href="#e-obj-uiitem-3" data-e="e-obj-uiitem-3">item:set_visible</a><a class="chip" href="#e-obj-uiitem-4" data-e="e-obj-uiitem-4">item:set_callback</a><a class="chip" href="#e-obj-uiitem-5" data-e="e-obj-uiitem-5">item:set_subtab</a><a class="chip" href="#e-obj-uiitem-6" data-e="e-obj-uiitem-6">item:name</a><a class="chip" href="#e-obj-uiitem-6" data-e="e-obj-uiitem-6">item:valid</a></div></div>
+    <div class="synopsis"><p class="syn-h">on this page</p><div class="chips"><a class="chip" href="#e-obj-uiitem-1" data-e="e-obj-uiitem-1">item:get</a><a class="chip" href="#e-obj-uiitem-2" data-e="e-obj-uiitem-2">item:set</a><a class="chip" href="#e-obj-uiitem-3" data-e="e-obj-uiitem-3">item:set_visible</a><a class="chip" href="#e-obj-uiitem-4" data-e="e-obj-uiitem-4">item:set_callback</a><a class="chip" href="#e-obj-uiitem-5" data-e="e-obj-uiitem-5">item:color_picker</a><a class="chip" href="#e-obj-uiitem-6" data-e="e-obj-uiitem-6">item:name</a><a class="chip" href="#e-obj-uiitem-6" data-e="e-obj-uiitem-6">item:valid</a><a class="chip" href="#e-obj-uiitem-7" data-e="e-obj-uiitem-7">item:set_subtab</a></div></div>
     <h2 class="sec" id="s-value">value</h2><div class="entry" id="e-obj-uiitem-1"><div class="sig"><b>item:get</b>( )</div><div class="desc">The control&rsquo;s value, typed by what it actually is: boolean for a checkbox, number for a slider or combobox, live on/off for a hotkey, <code>{r,g,b,a}</code> for a colour picker, an array of indices for a multiselect.</div></div>
 <div class="entry" id="e-obj-uiitem-2"><div class="sig"><b>item:set</b>( <i>value</i> )</div><div class="desc">Write it back, same types.</div></div>
 <h2 class="sec" id="s-behaviour">behaviour</h2><div class="entry" id="e-obj-uiitem-3"><div class="sig"><b>item:set_visible</b>( <i>bool</i> )</div><div class="desc">Show or hide. Re-read every frame, so flip it freely.</div></div>
 <div class="entry" id="e-obj-uiitem-4"><div class="sig"><b>item:set_callback</b>( <i>fn</i> )</div><div class="desc">Runs when the value changes. One per control &mdash; setting it again replaces the old one.</div></div>
-<div class="entry" id="e-obj-uiitem-5"><div class="sig"><b>item:set_subtab</b>( <i>page</i> )</div><div class="desc">Move it onto a page from <code>ui.subtab</code>.</div></div>
+<div class="entry" id="e-obj-uiitem-5"><div class="sig"><b>item:color_picker</b>( <em>[r]</em>, <em>[g]</em>, <em>[b]</em>, <em>[a]</em>, <em>[name]</em> ) <em>&rarr; item</em></div><div class="desc">Attach a colour swatch to <b>this</b> control: same row, right aligned, no label of its own. Call it again to stack another to its left.</div></div>
 <div class="entry" id="e-obj-uiitem-6"><div class="sig"><b>item:name</b>( ) <em>&middot;</em> <b>item:valid</b>( )</div><div class="desc">Its label, and whether it still exists.</div></div>
-<pre><span class="k">local</span> mode  = <span class="f">ui.combobox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;mode&quot;</span>, <span class="s">&quot;off&quot;</span>, <span class="s">&quot;low&quot;</span>, <span class="s">&quot;high&quot;</span> )
-<span class="k">local</span> power = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;power&quot;</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
+<h2 class="sec" id="s-deprecated">deprecated</h2><div class="entry" id="e-obj-uiitem-7"><div class="sig"><b>item:set_subtab</b>( <i>page</i> ) <span class='pill bad'>avoid</span></div><div class="desc">Moves it onto a page <em>after</em> the fact. Kept so old scripts still load, but the number it takes is ambiguous &mdash; a page id from <code>ui.subtab</code> starts at 1 and a built-in page index starts at 0, so the same value means two different pages and the control can end up in a tab you never named. <b>Pass the page name to the creator instead.</b></div></div>
+<pre><span class="k">local</span> mode  = <span class="f">ui.combobox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;script options&quot;</span>, <span class="s">&quot;mode&quot;</span>, <span class="s">&quot;off&quot;</span>, <span class="s">&quot;low&quot;</span>, <span class="s">&quot;high&quot;</span> )
+<span class="k">local</span> power = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;script options&quot;</span>, <span class="s">&quot;power&quot;</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
 
 <span class="c">-- hide the slider unless a mode is picked</span>
 mode:<span class="f">set_callback</span>( <span class="k">function</span>( )
@@ -668,38 +714,36 @@ mode:<span class="f">set_callback</span>( <span class="k">function</span>( )
   <div class="page" id="p-ui">
     <p class="kicker">menu</p>
     <h1>ui</h1>
-    <div class="intro"><p>Creators take <code>(tab, column, name, &hellip;)</code> and give you a handle. <code>column</code> is <code>0</code> or <code>1</code>.</p></div>
+    <div class="intro"><p>Every creator takes <code>( tab, [subtab], column, label, &hellip; )</code> as names and gives you back the control.</p></div>
     <div class="synopsis"><p class="syn-h">on this page</p><div class="chips"><a class="chip" href="#e-ui-1" data-e="e-ui-1">ui.checkbox</a><a class="chip" href="#e-ui-2" data-e="e-ui-2">ui.slider</a><a class="chip" href="#e-ui-3" data-e="e-ui-3">ui.combobox</a><a class="chip" href="#e-ui-4" data-e="e-ui-4">ui.multiselect</a><a class="chip" href="#e-ui-5" data-e="e-ui-5">ui.hotkey</a><a class="chip" href="#e-ui-6" data-e="e-ui-6">ui.color_picker</a><a class="chip" href="#e-ui-7" data-e="e-ui-7">ui.button</a><a class="chip" href="#e-ui-8" data-e="e-ui-8">ui.intbox</a></div></div>
-    <h2 class="sec" id="s-controls">controls</h2><div class="entry" id="e-ui-1"><div class="sig"><b>ui.checkbox</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <em>[default]</em> )</div><div class="desc">On/off toggle.</div></div>
-<div class="entry" id="e-ui-2"><div class="sig"><b>ui.slider</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>min</i>, <i>max</i>, <em>[default]</em> )</div><div class="desc">Number in a range.</div></div>
-<div class="entry" id="e-ui-3"><div class="sig"><b>ui.combobox</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>&hellip;items</i> )</div><div class="desc">Pick one. <code>ui.get</code> gives the index.</div></div>
-<div class="entry" id="e-ui-4"><div class="sig"><b>ui.multiselect</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>&hellip;items</i> )</div><div class="desc">Pick several. <code>ui.get</code> gives an array of indices.</div></div>
-<div class="entry" id="e-ui-5"><div class="sig"><b>ui.hotkey</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc"><code>ui.get</code> gives whether it&rsquo;s currently active.</div></div>
-<div class="entry" id="e-ui-6"><div class="sig"><b>ui.color_picker</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <em>[r]</em>, <em>[g]</em>, <em>[b]</em>, <em>[a]</em> )</div><div class="desc"><code>ui.get</code> gives <code>{r,g,b,a}</code>.</div></div>
-<h2 class="sec" id="s-actions">actions</h2><div class="entry" id="e-ui-7"><div class="sig"><b>ui.button</b>( <i>tab</i>, <i>col</i>, <i>name</i>, <i>fn</i> )</div><div class="desc">Runs <code>fn</code> when clicked.</div></div>
-<div class="entry" id="e-ui-8"><div class="sig"><b>ui.intbox</b>( <i>tab</i>, <i>col</i>, <i>name</i> )</div><div class="desc">Number entry field.</div></div>
-<div class="note "><strong>Everything you do <em>to</em> a control is a method on it</strong> &mdash; <code>get</code>, <code>set</code>, <code>set_visible</code>, <code>set_callback</code>, <code>set_subtab</code>. See <a href='#obj-uiitem' data-p='obj-uiitem' class='xref'>ui item</a>.</div><pre><span class="k">local</span> mode  = <span class="f">ui.combobox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;mode&quot;</span>, <span class="s">&quot;off&quot;</span>, <span class="s">&quot;low&quot;</span>, <span class="s">&quot;high&quot;</span> )
-<span class="k">local</span> power = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;power&quot;</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
+    <div class="note "><strong>Controls are addressed by NAME.</strong> Three names means no page; four means a specific page. Everything matches without caring about case, and a name that doesn&rsquo;t exist raises straight away with the valid ones listed &mdash; so a typo is a loud error on that line, not a control that quietly goes missing.</div><pre><span class="f">ui.checkbox</span>( <span class="s">&quot;sogbot&quot;</span>, <span class="s">&quot;accuracy&quot;</span>, <span class="s">&quot;my toggle&quot;</span> )               <span class="c">-- no page</span>
+<span class="f">ui.checkbox</span>( <span class="s">&quot;sogbot&quot;</span>, <span class="s">&quot;targeting&quot;</span>, <span class="s">&quot;accuracy&quot;</span>, <span class="s">&quot;my toggle&quot;</span> )  <span class="c">-- on that page</span></pre><h2 class="sec" id="s-controls">controls</h2><div class="entry" id="e-ui-1"><div class="sig"><b>ui.checkbox</b>( <i>tab</i>, <em>[subtab]</em>, <i>column</i>, <i>label</i>, <em>[default]</em> )</div><div class="desc">On/off toggle.</div></div>
+<div class="entry" id="e-ui-2"><div class="sig"><b>ui.slider</b>( <i>tab</i>, <em>[subtab]</em>, <i>column</i>, <i>label</i>, <i>min</i>, <i>max</i>, <em>[default]</em> )</div><div class="desc">Number in a range.</div></div>
+<div class="entry" id="e-ui-3"><div class="sig"><b>ui.combobox</b>( <i>tab</i>, <em>[subtab]</em>, <i>column</i>, <i>label</i>, <i>&hellip;items</i> )</div><div class="desc">Pick one. <code>get</code> gives the index.</div></div>
+<div class="entry" id="e-ui-4"><div class="sig"><b>ui.multiselect</b>( <i>tab</i>, <em>[subtab]</em>, <i>column</i>, <i>label</i>, <i>&hellip;items</i> )</div><div class="desc">Pick several. <code>get</code> gives an array of indices.</div></div>
+<div class="entry" id="e-ui-5"><div class="sig"><b>ui.hotkey</b>( <i>tab</i>, <em>[subtab]</em>, <i>column</i>, <i>label</i> )</div><div class="desc"><code>get</code> gives whether it&rsquo;s currently held.</div></div>
+<div class="entry" id="e-ui-6"><div class="sig"><b>ui.color_picker</b>( <i>tab</i>, <em>[subtab]</em>, <i>column</i>, <i>label</i>, <em>[r, g, b, a]</em> )</div><div class="desc"><code>get</code> gives <code>{r,g,b,a}</code>.</div></div>
+<h2 class="sec" id="s-actions">actions</h2><div class="entry" id="e-ui-7"><div class="sig"><b>ui.button</b>( <i>tab</i>, <em>[subtab]</em>, <i>column</i>, <i>label</i>, <i>fn</i> )</div><div class="desc">Runs <code>fn</code> when clicked.</div></div>
+<div class="entry" id="e-ui-8"><div class="sig"><b>ui.intbox</b>( <i>tab</i>, <em>[subtab]</em>, <i>column</i>, <i>label</i>, <em>[digits]</em> )</div><div class="desc">Number entry field.</div></div>
+<h2 class="sec" id="s-columns">columns</h2><div class="note "><strong><code>&quot;left&quot;</code> and <code>&quot;right&quot;</code> always work</strong> as column names, and you <b>need</b> them on the <b>visuals</b> tab, which declares no column titles at all. <code>&quot;0&quot;</code> and <code>&quot;1&quot;</code> work too.</div><h2 class="sec" id="s-where-things-live">where things live</h2><div class="tw"><table><thead><tr><th>tab</th><th>subtabs</th><th>columns</th></tr></thead><tbody><tr><td><code>sogbot</code></td><td><code>targeting</code>, <code>advanced</code></td><td><code>targeting</code> | <code>accuracy</code><br><code>auto stop</code> | <code>resolver</code></td></tr><tr><td><code>anti-sog</code></td><td>&mdash;</td><td><code>anti-aim</code> | <code>fake-lag</code></td></tr><tr><td><code>players</code></td><td><code>enemy</code>, <code>local</code></td><td><code>esp</code> | <code>models</code><br><code>models</code> | <code>effects</code></td></tr><tr><td><code>visuals</code></td><td><code>world</code>, <code>misc</code>, <code>post</code></td><td>none &mdash; use <code>left</code> / <code>right</code></td></tr><tr><td><code>skins</code></td><td><code>skins</code>, <code>extra</code></td><td><code>skins</code> | <code>models</code><br><code>particles</code> | <code>cosmetics</code></td></tr><tr><td><code>misc</code></td><td>&mdash;</td><td><code>general</code> | <code>options</code></td></tr><tr><td><code>fonts</code></td><td>&mdash;</td><td><code>fonts</code> | <code>properties</code></td></tr><tr><td><code>plist</code></td><td>&mdash;</td><td><code>players</code> | <code>whitelist</code></td></tr><tr><td><code>scripts</code></td><td><code>manager</code></td><td><code>scripts</code> | <code>script options</code></td></tr></tbody></table></div><div class="note "><code>players</code> has a <code>models</code> column under <b>both</b> subtabs. That isn&rsquo;t ambiguous &mdash; the subtab is resolved first and the column is looked up inside it.</div><div class="note ">Column 0 of the <b>scripts</b> manager page belongs to the script manager itself, so put your own controls in <code>script options</code>.</div><h2 class="sec" id="s-using-them">using them</h2><div class="note "><strong>Everything you do <em>to</em> a control is a method on it</strong> &mdash; <code>get</code>, <code>set</code>, <code>set_visible</code>, <code>set_callback</code>, <code>color_picker</code>. See <a href='#obj-uiitem' data-p='obj-uiitem' class='xref'>ui item</a>.</div><pre><span class="k">local</span> mode  = <span class="f">ui.combobox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;script options&quot;</span>, <span class="s">&quot;mode&quot;</span>, <span class="s">&quot;off&quot;</span>, <span class="s">&quot;low&quot;</span>, <span class="s">&quot;high&quot;</span> )
+<span class="k">local</span> power = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;script options&quot;</span>, <span class="s">&quot;power&quot;</span>, <span class="n">0</span>, <span class="n">100</span>, <span class="n">50</span> )
 
 <span class="c">-- hide the slider unless a mode is picked</span>
 mode:<span class="f">set_callback</span>( <span class="k">function</span>( )
     power:<span class="f">set_visible</span>( mode:<span class="f">get</span>( ) ~= <span class="n">0</span> )
-<span class="k">end</span> )</pre><div class="note "><strong>Values save automatically</strong> with the config, and load correctly even if the config was loaded before your script was.</div>
+<span class="k">end</span> )</pre><div class="note "><strong>Values save automatically</strong> with the config, and load correctly even if the config was loaded before your script was.</div><div class="note ">Control names are capped at <b>25 characters</b> &mdash; anything longer is cut with a <code>..</code>. The full name is still what the config keys off, so two controls whose names only differ past the cut still save separately.</div>
   </div>
 
   <div class="page" id="p-subtabs">
     <p class="kicker">menu</p>
     <h1>subtabs</h1>
-    <div class="intro"><p>Give your script its own page so its controls aren&rsquo;t mixed in with everything else.</p></div>
+    <div class="intro"><p>Claim your own page in a tab rather than sharing the manager column.</p></div>
     
-    <div class="entry" id="e-subtabs-1"><div class="sig"><b>ui.subtab</b>( <i>tab</i>, <i>name</i>, <em>[left_title]</em>, <em>[right_title]</em> )</div><div class="desc">Adds a page and returns it. Column titles are optional.</div></div>
-<div class="entry" id="e-subtabs-2"><div class="sig"><b>ui.set_subtab</b>( <i>handle</i>, <i>page</i> )</div><div class="desc">Moves a control to that page.</div></div>
-<pre><span class="k">local</span> page  = <span class="f">ui.subtab</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;slowwalk&quot;</span>, <span class="s">&quot;SLOWWALK&quot;</span>, <span class="s">&quot;OPTIONS&quot;</span> )
-<span class="k">local</span> key   = <span class="f">ui.hotkey</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;key&quot;</span> )
-<span class="k">local</span> speed = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;speed&quot;</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
+    <div class="entry" id="e-subtabs-1"><div class="sig"><b>ui.subtab</b>( <i>tab</i>, <i>name</i>, <em>[left_title]</em>, <em>[right_title]</em> ) <em>&rarr; string</em></div><div class="desc">Adds a page to that tab and hands back its <b>name</b>, ready to pass as the second argument to any creator. Column titles are optional and pass through verbatim &mdash; lower case is the house style.</div></div>
+<pre><span class="k">local</span> page = <span class="f">ui.subtab</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;slowwalk&quot;</span>, <span class="s">&quot;slowwalk&quot;</span>, <span class="s">&quot;options&quot;</span> )
 
-key:<span class="f">set_subtab</span>( page )
-speed:<span class="f">set_subtab</span>( page )</pre><div class="tw"><table><thead><tr><th></th><th>where your controls show up</th></tr></thead><tbody><tr><td><strong>with a subtab</strong></td><td>Your own page, both columns.</td></tr><tr><td><strong>without</strong></td><td>The main page, column 1, only while your script is selected in the list.</td></tr></tbody></table></div>
+<span class="k">local</span> key   = <span class="f">ui.hotkey</span>( <span class="s">&quot;scripts&quot;</span>, page, <span class="s">&quot;slowwalk&quot;</span>, <span class="s">&quot;key&quot;</span> )
+<span class="k">local</span> speed = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, page, <span class="s">&quot;options&quot;</span>, <span class="s">&quot;speed&quot;</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )</pre><div class="note "><strong>A page can be added to ANY tab</strong>, including one that had no page strip at all &mdash; which is exactly why both the three-name and four-name creator forms have to keep working. Adding a page to <b>anti-sog</b> does not move that tab&rsquo;s own controls; they stay on page 0.</div><div class="note "><strong>Claim a page and your controls get both columns to themselves.</strong> Skip it and they share the manager page, visible only while your script is the one selected in the picker &mdash; so two scripts never pile into the same column.</div><div class="note warn"><strong>This used to hand back an opaque id.</strong> That id was indistinguishable from a built-in page index &mdash; ids start at 1, indices at 0 &mdash; so binding to an existing subtab could silently gate your control to a page in a completely different tab, and it would vanish from where you put it. Names cannot collide that way.</div><div class="note ">Values persist to config automatically. A config loaded <em>before</em> your script runs is replayed onto your controls when they appear, so load order doesn&rsquo;t matter.</div>
   </div>
 
   <div class="page" id="p-render">
@@ -975,6 +1019,29 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
 <span class="f">ffi.cast</span>( <span class="s">&quot;float*&quot;</span>, addr )[ <span class="n">0</span> ] = <span class="n">0</span></pre><div class="note bad"><strong>ffi can do anything the cheat can</strong>, including crash the game. Only turn it on for scripts you trust. It also bypasses every restriction listed elsewhere in these docs.</div><div class="note "><code>get_prop_address</code> and <code>entity.get_offset</code> are there so you don&rsquo;t have to look offsets up yourself, and so they keep working after a game update. Hardcode one if you&rsquo;d rather, or if the prop isn&rsquo;t something they can resolve.</div>
   </div>
 
+  <div class="page" id="p-changelog">
+    <p class="kicker">reference</p>
+    <h1>changelog</h1>
+    <div class="intro"><p>What changed, newest first.</p></div>
+    
+    <div class="rel"><div class="rel-h"><h2>current</h2><span class="rel-d">unreleased</span></div><div class="chg"><span class="chg-k added">added</span><span class="chg-t"><b>A bug report can be sent from this page</b> &mdash; the <em>report a bug</em> tab delivers to a private channel directly, no account or email needed.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t"><b>Creating a control on a page the same script just made raised "no such column".</b> The page&rsquo;s column names only landed at the next frame&rsquo;s flush, so <code>ui.subtab</code> + creator on the next line could never resolve them.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t"><b>Every ui name error read as <code>C++ exception</code>.</b> The real message &mdash; which names the valid tabs/subtabs/columns &mdash; was flattened at the scripting boundary; it now reaches the console, blaming the caller&rsquo;s line.</span></div><div class="chg"><span class="chg-k added">added</span><span class="chg-t"><b>Controls are addressed by name</b> &mdash; <code>ui.checkbox( tab, [subtab], column, label )</code>. Case insensitive, and a bad name raises with the valid ones listed.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t"><b>Binding to an existing subtab could send a control to another tab&rsquo;s page.</b> Page ids started at 1 and page indices at 0, so <code>set_subtab( 1 )</code> was genuinely ambiguous. Names cannot collide.</span></div><div class="chg"><span class="chg-k added">added</span><span class="chg-t"><code>vec3</code>, <code>vec2</code> and <code>ang</code> with real field access, operators and the full method set.</span></div><div class="chg"><span class="chg-k added">added</span><span class="chg-t"><b>trace</b> &mdash; 11 calls including <code>bullet</code>, <code>can_hit</code>, <code>to_exit</code> and <code>max_damage</code>, all sharing the aimbot&rsquo;s own penetration maths.</span></div><div class="chg"><span class="chg-k added">added</span><span class="chg-t"><b>net</b>, <b>cvar</b> and <b>playerlist</b> modules, plus the <b>plist</b> tab and its aimbot whitelist.</span></div><div class="chg"><span class="chg-k added">added</span><span class="chg-t"><code>cmd:quick_stop( )</code>, and <code>item:color_picker( )</code> for swatches that ride another control&rsquo;s row.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t"><b>Unloading a script with a paint handler could take the game down.</b> Its font was freed while the render thread still held draw commands against it.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t"><b>Reloading left orphaned pages behind</b> and the strip grew every time.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t"><code>get_string</code> returned garbage <em>and re-registered the convar</em> on every read.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t">Long labels ran into the next column; script names are now capped and clipped.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t">Click areas matched what each control actually draws &mdash; a checkbox no longer swallows clicks meant for its row.</span></div><div class="chg"><span class="chg-k fixed">fixed</span><span class="chg-t">Console output is coloured, breaks lines, and no longer treats logged text as a printf format.</span></div></div><div class="note "><strong>This page is written by hand in <code>docs/gen.py</code>.</strong> Add a <code>rel( )</code> block at the top for each release &mdash; newest first.</div>
+  </div>
+
+  <div class="page" id="p-report">
+    <p class="kicker">reference</p>
+    <h1>report a bug</h1>
+    <div class="intro"><p>Found something broken? This builds a report worth reading.</p></div>
+    
+    <div class="note "><strong>The more of the box below you fill in, the less likely this gets closed with &ldquo;cannot reproduce&rdquo;.</strong> A script that reproduces it is worth more than any description.</div><div class="bug"><label>What happened<textarea id="b-what" rows="3" placeholder="the control vanished from the page I put it on"></textarea></label><label>What you expected instead<textarea id="b-want" rows="2" placeholder="it stays where I put it"></textarea></label><label>Smallest script that shows it<textarea id="b-repro" rows="6" placeholder="ui.checkbox( &quot;sogbot&quot;, &quot;targeting&quot;, &quot;accuracy&quot;, &quot;test&quot; )"></textarea></label><label>Console output, if any<textarea id="b-log" rows="3" placeholder="paste anything the console printed"></textarea></label><div class="bug-row"><button class="bug-b" id="b-send" hidden>Send report</button><button class="bug-b alt" id="b-copy">Copy report</button><button class="bug-b alt" id="b-mail">Open in email</button><span class="bug-msg" id="b-msg"></span></div></div><div class="note "><strong><em>Send report</em> delivers straight to a private channel</strong> &mdash; one click, nothing to fill in beyond the box above, and the page tells you whether it went through. The report goes exactly as you see it, plus your browser version; nothing else is collected. <em>Copy report</em> and <em>Open in email</em> do the same thing by hand if you&rsquo;d rather.</div><h2 class="sec" id="s-worth-including">worth including</h2><div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><b>Which build</b></td><td>The date and time stamp in the bottom-right corner of the menu.</td></tr><tr><td><b>Does it survive a reload</b></td><td>Press <em>reload all</em> in the scripts tab and say whether it comes back.</td></tr><tr><td><b>Does it happen with one script</b></td><td>Unload everything else first. Interactions between scripts look identical to a broken binding.</td></tr><tr><td><b>In game or at the menu</b></td><td>Several things are only valid while alive &mdash; the move events, most of <code>trace</code>.</td></tr></tbody></table></div><div class="note "><strong>If the game closed itself</strong>, there may be a dump in <code>%TEMP%\soggybot</code>. Attach the newest <code>.txt</code> &mdash; it is small and worth far more than a description. Note that a fault on the render thread leaves no dump at all, so say if there isn&rsquo;t one.</div><pre><span class="c">-- a good repro is small, self-contained, and says what it expects</span>
+<span class="k">local</span> box = <span class="f">ui.checkbox</span>( <span class="s">&quot;sogbot&quot;</span>, <span class="s">&quot;targeting&quot;</span>, <span class="s">&quot;accuracy&quot;</span>, <span class="s">&quot;repro&quot;</span> )
+
+<span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
+    <span class="c">-- expected: prints true / false</span>
+    <span class="c">-- actual:   raises &quot;attempt to index a nil value&quot;</span>
+    <span class="f">client.log</span>( box:<span class="f">get</span>( ) )
+<span class="k">end</span> )</pre>
+  </div>
+
   <div class="page" id="p-gotchas">
     <p class="kicker">reference</p>
     <h1>gotchas</h1>
@@ -994,8 +1061,8 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
     <h1>examples</h1>
     <div class="intro"><p>Complete scripts. Save any of these as a <code>.lua</code> file and load it.</p></div>
     
-    <h2 class="sec" id="s-watermark-with-a-toggle">watermark with a toggle</h2><pre><span class="k">local</span> on   = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;watermark&quot;</span>, <span class="k">true</span> )
-<span class="k">local</span> col  = <span class="f">ui.color_picker</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;colour&quot;</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span> )
+    <h2 class="sec" id="s-watermark-with-a-toggle">watermark with a toggle</h2><pre><span class="k">local</span> on   = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;script options&quot;</span>, <span class="s">&quot;watermark&quot;</span>, <span class="k">true</span> )
+<span class="k">local</span> col  = <span class="f">ui.color_picker</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;script options&quot;</span>, <span class="s">&quot;colour&quot;</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span>, <span class="n">255</span> )
 <span class="k">local</span> font = <span class="f">render.create_font</span>( <span class="s">&quot;Verdana&quot;</span>, <span class="n">14</span>, <span class="n">500</span> )
 
 <span class="f">callbacks.add</span>( <span class="s">&quot;paint&quot;</span>, <span class="k">function</span>( )
@@ -1034,7 +1101,7 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
         y = y + <span class="n">14</span>
         <span class="f">render.text</span>( <span class="n">12</span>, y, <span class="n">235</span>, <span class="n">80</span>, <span class="n">80</span>, <span class="n">255</span>, why .. <span class="s">&quot;: &quot;</span> .. n )
     <span class="k">end</span>
-<span class="k">end</span> )</pre><h2 class="sec" id="s-esp-flags">esp flags</h2><pre><span class="k">local</span> on = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">1</span>, <span class="s">&quot;extra flags&quot;</span>, <span class="k">true</span> )
+<span class="k">end</span> )</pre><h2 class="sec" id="s-esp-flags">esp flags</h2><pre><span class="k">local</span> on = <span class="f">ui.checkbox</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;script options&quot;</span>, <span class="s">&quot;extra flags&quot;</span>, <span class="k">true</span> )
 
 <span class="f">callbacks.add</span>( <span class="s">&quot;player_esp&quot;</span>, <span class="k">function</span>( ctx )
     <span class="k">if</span> <span class="k">not</span> on:<span class="f">get</span>( ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
@@ -1049,12 +1116,9 @@ f:<span class="f">text</span>( <span class="n">10</span>, <span class="n">10</sp
     <span class="k">if</span> cash <span class="k">and</span> cash &gt;= <span class="n">4000</span> <span class="k">then</span>
         ctx:<span class="f">add_flag</span>( <span class="s">&quot;rich&quot;</span>, <span class="n">255</span>, <span class="n">178</span>, <span class="n">0</span> )
     <span class="k">end</span>
-<span class="k">end</span> )</pre><h2 class="sec" id="s-slowwalk-on-its-own-page">slowwalk on its own page</h2><pre><span class="k">local</span> page  = <span class="f">ui.subtab</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;slowwalk&quot;</span> )
-<span class="k">local</span> key   = <span class="f">ui.hotkey</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;slowwalk key&quot;</span> )
-<span class="k">local</span> speed = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, <span class="n">0</span>, <span class="s">&quot;speed&quot;</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
-
-key:<span class="f">set_subtab</span>( page )
-speed:<span class="f">set_subtab</span>( page )
+<span class="k">end</span> )</pre><h2 class="sec" id="s-slowwalk-on-its-own-page">slowwalk on its own page</h2><pre><span class="k">local</span> page  = <span class="f">ui.subtab</span>( <span class="s">&quot;scripts&quot;</span>, <span class="s">&quot;slowwalk&quot;</span>, <span class="s">&quot;slowwalk&quot;</span>, <span class="s">&quot;options&quot;</span> )
+<span class="k">local</span> key   = <span class="f">ui.hotkey</span>( <span class="s">&quot;scripts&quot;</span>, page, <span class="s">&quot;slowwalk&quot;</span>, <span class="s">&quot;key&quot;</span> )
+<span class="k">local</span> speed = <span class="f">ui.slider</span>( <span class="s">&quot;scripts&quot;</span>, page, <span class="s">&quot;options&quot;</span>, <span class="s">&quot;speed&quot;</span>, <span class="n">10</span>, <span class="n">250</span>, <span class="n">80</span> )
 
 <span class="f">callbacks.add</span>( <span class="s">&quot;pre_move&quot;</span>, <span class="k">function</span>( cmd )
     <span class="k">if</span> <span class="k">not</span> key:<span class="f">get</span>( ) <span class="k">then</span> <span class="k">return</span> <span class="k">end</span>
@@ -1257,5 +1321,160 @@ speed:<span class="f">set_subtab</span>( page )
   });
 
   show(location.hash.slice(1) || 'overview');
+})();
+
+/* ---------- bug report ---------- */
+(function(){
+  var copy = document.getElementById('b-copy');
+  if(!copy) return;
+
+  var send = document.getElementById('b-send');
+  var mail = document.getElementById('b-mail');
+  var msg  = document.getElementById('b-msg');
+
+  /* kept in halves so the page never carries a plain address for a scraper to lift */
+  var TO = 'soggybot.bugs' + String.fromCharCode(64) + 'example.com';
+
+  /* the webhook, reversed + base64 + chunked at build time, rebuilt only at click.
+     defeats the regex scrapers that grep public repos for webhook urls; a human in
+     devtools still wins, which is why the target is a throwaway channel. */
+  var HOOK_CHUNKS = ["bkZ3S01DVGh0R09HblJVM2xz","UFFiRXhsd0ZDeV9LSktJZXdu","Q2p4dVN4dWlfd3RneHc0TGxn","dGhwRUFGYl9UM3RZSGEvNDcw","NTEwOTM4MTU3MzE1MjM1MS9z","a29vaGJldy9pcGEvbW9jLmRy","b2NzaWQvLzpzcHR0aA=="];
+  function hook(){
+    if(!HOOK_CHUNKS.length) return null;
+    try { return atob(HOOK_CHUNKS.join('')).split('').reverse().join(''); }
+    catch(e){ return null; }
+  }
+
+  function val(id){ return (document.getElementById(id).value || '').trim(); }
+
+  function flash(text, bad){
+    msg.textContent = text;
+    msg.className = 'bug-msg on' + (bad ? ' err' : '');
+    clearTimeout(flash.t);
+    flash.t = setTimeout(function(){ msg.className = 'bug-msg'; }, 2600);
+  }
+
+  function build(){
+    var parts = [];
+    function sec(title, body){ if(body) parts.push(title + '\n' + body); }
+
+    sec('WHAT HAPPENED',  val('b-what'));
+    sec('EXPECTED',       val('b-want'));
+    sec('REPRO',          val('b-repro'));
+    sec('CONSOLE',        val('b-log'));
+
+    if(!parts.length) return null;
+    parts.push('---\nbrowser: ' + navigator.userAgent);
+    return parts.join('\n\n');
+  }
+
+  copy.addEventListener('click', function(){
+    var text = build();
+    if(!text) return flash('fill something in first', true);
+
+    var done = function(){ flash('copied — paste it wherever'); };
+    var fail = function(){ flash('clipboard blocked — select and copy by hand', true); };
+
+    /* clipboard api needs a secure context; file:// and plain http do not get one */
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(done, fail);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch(e){}
+      document.body.removeChild(ta);
+      ok ? done() : fail();
+    }
+  });
+
+  /* ---- send straight to discord ---- */
+  if(hook()) send.hidden = false;
+
+  var sending = false;
+  var COOLDOWN_MS = 60000;
+
+  send.addEventListener('click', function(){
+    if(sending) return;
+
+    var text = build();
+    if(!text) return flash('fill something in first', true);
+
+    /* polite self-throttle; the webhook's own 5-per-2s limit is the real cap */
+    var last = 0;
+    try { last = +localStorage.getItem('bugSentAt') || 0; } catch(e){}
+    var wait = COOLDOWN_MS - (Date.now() - last);
+    if(wait > 0) return flash('sent recently — wait ' + Math.ceil(wait / 1000) + 's', true);
+
+    var url = hook();
+    if(!url) return flash('sending is not set up — use copy report', true);
+
+    var what  = val('b-what');
+    var title = (what ? what.split('\n')[0] : 'bug report').slice(0, 240);
+
+    /* the report itself travels as a FILE. an attachment has no character cap that a
+       repro script would hit, and its content is never parsed as markdown or mentions —
+       so there is nothing to sanitise and nothing to break out of. */
+    var payload = {
+      username: 'docs bug report',
+      embeds: [{
+        title: title,
+        description: 'full report attached',
+        color: 0xFFB200
+      }],
+      /* the url is public by nature; this makes a spammed channel the worst case —
+         no pings, ever, even if someone posts @everyone through it by hand */
+      allowed_mentions: { parse: [] }
+    };
+
+    /* multipart/form-data is a CORS "simple request": no preflight round-trip */
+    var fd = new FormData();
+    fd.append('payload_json', JSON.stringify(payload));
+    fd.append('files[0]', new Blob([text], { type: 'text/plain' }), 'report.txt');
+
+    sending = true;
+    send.disabled = true;
+    flash('sending…');
+
+    fetch(url + '?wait=true', { method: 'POST', body: fd }).then(function(r){
+      if(r.ok){
+        try { localStorage.setItem('bugSentAt', String(Date.now())); } catch(e){}
+        return flash('sent — thank you');
+      }
+      if(r.status === 404) return flash('reporting is down — use copy report', true);
+      if(r.status === 429){
+        return r.json().then(function(j){
+          flash('rate limited — retry in ' + Math.ceil((j && j.retry_after) || 2) + 's', true);
+        }, function(){ flash('rate limited — try again shortly', true); });
+      }
+      return flash('send failed (' + r.status + ') — use copy report', true);
+    }).catch(function(){
+      flash('network error — use copy report', true);
+    }).then(function(){
+      sending = false;
+      send.disabled = false;
+    });
+  });
+
+  mail.addEventListener('click', function(){
+    var text = build();
+    if(!text) return flash('fill something in first', true);
+
+    var what = val('b-what');
+    var subj = 'soggybot lua: ' + (what ? what.split('\n')[0].slice(0, 70) : 'bug report');
+
+    /* mailto bodies get truncated somewhere north of ~1800 chars by most clients, and the
+       cap is not consistent, so hand over a stub and let the clipboard carry the rest */
+    if(text.length > 1500){
+      flash('report is long — use copy report instead', true);
+      return;
+    }
+    location.href = 'mailto:' + TO
+                  + '?subject=' + encodeURIComponent(subj)
+                  + '&body='    + encodeURIComponent(text);
+  });
 })();
 </script>
